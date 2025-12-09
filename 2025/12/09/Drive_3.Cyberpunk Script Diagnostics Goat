@@ -1,0 +1,20 @@
+{
+  "runSettings": {
+    "model": "models/veo-2.0-generate-001",
+    "assetCount": 1,
+    "aspectRatio": "16:9",
+    "assetDuration": "8s",
+    "outputResolution": "1K"
+  },
+  "veoPrompt": {
+    "veoTurns": [{
+      "generatedVideos": [{
+        "driveVideo": {
+          "id": "1sZ1jpxgpztjO_JwGm-fI72bWLmOyaQxM"
+        },
+        "aspectRatio": "16:9"
+      }],
+      "prompt": "Create a futuristic, cyberpunk-style video themed around script diagnostics in a FiveM development environment. The scene is bathed in luminous neon blue tones, with glowing circuit patterns and digital holograms illuminating the background. Replace the original robot character with a mystical goat wearing a hoodie; the goat has prominent curved horns and a glowing crescent moon symbol on its forehead, exuding intelligence and arcane energy. The goat operates in front of sleek, high-tech monitors displaying Lua code snippets, floating fxmanifest.lua and server.lua windows, and interactive digital panels. Show the goat actively analyzing code, diagnosing script issues, and providing visual feedback in the style of an advanced AI analyzer tool. Code fragments, icons, and system diagrams hover around, highlighting programming, automation, and smart debugging. Maintain a clean, modern, and technical aesthetic with intense blue lighting, sharp futuristic UI elements, and visually impressive effects reminiscent of a cutting-edge virtual laboratory. The overall mood should convey mastery of technology, innovation, and a magical twist brought by the goat character."
+    }]
+  }
+}
