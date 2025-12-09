@@ -1,0 +1,35 @@
+Locales['se'] = {
+    ['not_owner'] = "Du är inte ägare av detta fordon",
+    ['checking_veh'] = "Söker efter fordon....",
+    ['veh_impounded'] = "Fordonet med denna nummerplåt ~g~%s finns hos bärgaren",
+    ['no_money'] = "Du har inte råd med och ta ut fordonet!",
+    ['cant_impound'] = "Fordonet kan inte bli bärgat.",
+    ['stop_veh'] = "Fordonet måste stå stilla för att sättas in i garage.",
+    ['garage_header_Vehicle'] = "Garage",
+    ['garage_header_Helicopter'] = "Helikoptrar",
+    ['garage_header_Plane'] = "Flygplan",
+    ['garage_header_Boat'] = "Båtar",
+
+    ['press_to_open_Vehicle'] = "Tryck 'E' för att öppna garage.",
+    ['press_to_hide_Vehicle'] = "Tryck 'E' för att ställa in fordonet.",
+    ['press_to_open_Boat'] = "Tryck 'E' för att kolla båtplatserna.",
+    ['press_to_hide_Boat'] = "Tryck 'E' för att ställa in båten.",
+    ['press_to_open_Plane'] = "Tryck 'E' för och kolla inne i hangaren.",
+    ['press_to_hide_Plane'] = "Tryck 'E' för att ställa in flygfordonet i hangaren.",
+    ['press_to_open_Helicopter'] = "Tryck 'E' för att öppna helikopterplattan.",
+    ['press_to_hide_Helicopter'] = "Tryck 'E' för att ställa in helikopter.",
+
+    ['garage_open_target_Vehicle'] = "Öppna Garage",
+    ['garage_hide_target_Vehicle'] = "Ställ in Vehicle",
+    ['garage_open_target_Boat'] = "Öppna hamn",
+    ['garage_hide_target_Boat'] = "Ställ in båt",
+    ['garage_open_target_Plane'] = "Öppna Flyghangar",
+    ['garage_hide_target_Plane'] = "Ställ in plan",
+    ['garage_open_target_Helicopter'] = "Öppna Helikopterplattan.",
+    ['garage_hide_target_Helicopter'] = "Ställ in helikopter",
+
+    ['novehicles'] = "Du äger inga fordon.",
+
+    ['showroom_leave'] = "Lämna Garage.",
+    ['showroom_leave_marker'] = "Tryck 'E' för att lämna.",
+}
