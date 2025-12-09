@@ -235,5 +235,53 @@ return {
     ["pin"] = {
         label = "pin",
         image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/pin.png?token=AO2YHHHHZBDDBK2O63RKIGTJG6WZU"
+    },
+    ["Screenshot_2025-12-09-02-09-06-970_com_miui_home"] = {
+        label = "Screenshot_2025-12-09-02-09-06-970_com_miui_home",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-09-02-09-06-970_com.miui.home.jpg?token=AO2YHHCP6PUTWMZL3LS2AD3JG6XUS"
+    },
+    ["IMG_20251126_201146"] = {
+        label = "IMG_20251126_201146",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251126_201146.png?token=AO2YHHGQM3Y3UKKX7QLXJFLJG6XU6"
+    },
+    ["Photoroom-20251204_231944385"] = {
+        label = "Photoroom-20251204_231944385",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom-20251204_231944385.png?token=AO2YHHA2P22SDOGB62PNTVTJG6XVC"
+    },
+    ["Screenshot_2025-12-04-23-19-42-258_com_photoroom_app"] = {
+        label = "Screenshot_2025-12-04-23-19-42-258_com_photoroom_app",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-04-23-19-42-258_com.photoroom.app.jpg?token=AO2YHHGEXK3CTBTOB2PWD3DJG6XVE"
+    },
+    ["Photoroom-20251204_231639462"] = {
+        label = "Photoroom-20251204_231639462",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom-20251204_231639462.png?token=AO2YHHD3ZMVZRLN5WJ33KDDJG6XVI"
+    },
+    ["IMG_20251203_104326"] = {
+        label = "IMG_20251203_104326",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251203_104326.png?token=AO2YHHHHLJ7CGPPZBNCQMJTJG6XXU"
+    },
+    ["Generated_Image_December_03__2025_-_10_41AM"] = {
+        label = "Generated_Image_December_03__2025_-_10_41AM",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Generated%20Image%20December%2003%2C%202025%20-%2010_41AM.png?token=AO2YHHCVFWTKPBASI5BAC6DJG6XX4"
+    },
+    ["Screenshot_2025-12-03-03-28-02-216_com_google_android_apps_docs"] = {
+        label = "Screenshot_2025-12-03-03-28-02-216_com_google_android_apps_docs",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-03-03-28-02-216_com.google.android.apps.docs.jpg?token=AO2YHHHRCFYB7JL6ZNCV6RDJG6XX6"
+    },
+    ["Screenshot_2025-12-01-09-50-57-086_com_rarlab_rar"] = {
+        label = "Screenshot_2025-12-01-09-50-57-086_com_rarlab_rar",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-01-09-50-57-086_com.rarlab.rar.jpg?token=AO2YHHBGIHQ2KH5EFL5PUYLJG6XYC"
+    },
+    ["hbIzdZDNDzS4"] = {
+        label = "hbIzdZDNDzS4",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/hbIzdZDNDzS4.png?token=AO2YHHDWMNWTWQZ55CXLWPLJG6XYI"
+    },
+    ["IMG_20251126_201101"] = {
+        label = "IMG_20251126_201101",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251126_201101.png?token=AO2YHHFLQYG2L7AUVNZFJ4TJG6XYM"
+    },
+    ["img_or1908230328_0004"] = {
+        label = "img_or1908230328_0004",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/img_or1908230328_0004.jpg?token=AO2YHHAPCQFCJ7CYGAWIBDDJG6XYS"
     }
 }
