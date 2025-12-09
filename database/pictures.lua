@@ -283,5 +283,53 @@ return {
     ["img_or1908230328_0004"] = {
         label = "img_or1908230328_0004",
         image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/img_or1908230328_0004.jpg?token=AO2YHHAPCQFCJ7CYGAWIBDDJG6XYS"
+    },
+    ["Drive_15"] = {
+        label = "Drive_15",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_15.png?token=AO2YHHCUBBCQPY4J7FGVRGTJG6ZMK"
+    },
+    ["Drive_16"] = {
+        label = "Drive_16",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_16.jpg?token=AO2YHHAS4Q5T4QKH6P37I7DJG6ZMQ"
+    },
+    ["Drive_17"] = {
+        label = "Drive_17",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_17.png?token=AO2YHHHJJUNRFL6MOPT7D3LJG6ZMS"
+    },
+    ["Drive_24"] = {
+        label = "Drive_24",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_24.png?token=AO2YHHEEIW22RSVUCKART5DJG6ZOQ"
+    },
+    ["Drive_25"] = {
+        label = "Drive_25",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_25.png?token=AO2YHHBNOZMWUXT4BU62P73JG6ZPA"
+    },
+    ["Drive_26"] = {
+        label = "Drive_26",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_26.png?token=AO2YHHARZBEJR7HLPHXHF5DJG6ZPO"
+    },
+    ["Drive_27"] = {
+        label = "Drive_27",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_27.png?token=AO2YHHEPVLKROZV2O3UCBTDJG6ZQG"
+    },
+    ["Drive_36"] = {
+        label = "Drive_36",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_36.jpg?token=AO2YHHETM6XTH6GHVWVHH23JG6ZRE"
+    },
+    ["Drive_37"] = {
+        label = "Drive_37",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_37.jpg?token=AO2YHHGCRSB7GOH5OMHR2V3JG6ZRI"
+    },
+    ["Drive_38"] = {
+        label = "Drive_38",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_38.jpg?token=AO2YHHEEIPBXLEUWHWTI423JG6ZRM"
+    },
+    ["Drive_39"] = {
+        label = "Drive_39",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_39.jpg?token=AO2YHHDO5TIACBEFJXTYAB3JG6ZRQ"
+    },
+    ["Drive_40"] = {
+        label = "Drive_40",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_40.jpg?token=AO2YHHDPCM43Q4HHSGPGWXDJG6ZRS"
     }
 }
