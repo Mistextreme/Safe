@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:900|Work+Sans:300" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Car Info</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Montserrat;
+            line-height: 0.15;
+            color: white;
+            background-color: transparent;
+            font-size: 14px;
+        }
+
+        .info-box {
+            padding: 5px 30px;
+            border-radius: 8px;
+            background-color: #12151ca9;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box img {
+            width: 34px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="info-box">
+        <img src="https://cdn.freebiesupply.com/logos/large/2x/bmw-logo-png-transparent.png" id="logo"
+            onerror="this.style.display='none'">
+        <h1 id="label"></h1>
+    </div>
+    <script>
+        window.addEventListener('message', function (event) {
+            if (event.data.action == "addInfo") {
+                document.getElementById('logo').src = event.data.logo
+                document.getElementById('label').innerHTML = event.data.label;
+            }
+        });
+    </script>
+</body>
+
+</html>
