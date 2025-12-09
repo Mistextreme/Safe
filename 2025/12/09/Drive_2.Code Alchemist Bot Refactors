@@ -1,0 +1,20 @@
+{
+  "runSettings": {
+    "model": "models/veo-2.0-generate-001",
+    "assetCount": 1,
+    "aspectRatio": "16:9",
+    "assetDuration": "8s",
+    "outputResolution": "1K"
+  },
+  "veoPrompt": {
+    "veoTurns": [{
+      "generatedVideos": [{
+        "driveVideo": {
+          "id": "10LyQc7kefZv3iar9yni2UGFalgxvBrRE"
+        },
+        "aspectRatio": "16:9"
+      }],
+      "prompt": "Create a 5-second seamless looping animated video (24fps, 1024x1024 resolution, MP4\nformat, silent) based on this magical code refactoring concept:\n[Visual Description]\nA central cute blue robot wearing programmer glasses, holding a glowing green light sword\nthat slices through lines of code. Floating beside it is a floating tablet displaying clean code\nsymbols (proper indentation, descriptive names, organized functions). On its left is a messy,\nobfuscated Lua code block (variables like L1_1, A0_2, F3_9, no comments, chaotic\nformatting). On its right is a clean, professional FiveM Lua code (meaningful names like\nplayerHealth, onPlayerDeath, validateInput, perfect indentation, clear structure). Two curved\nlime-green arrows encircle the robot — one from obfuscated code to clean code at the\nbottom, another returning from clean to obfuscated at the top — symbolizing transformation\nwithout breaking functionality. The top arc reads \"CODE ALCHEMIST BOT\" in stylish white\nmonospace font; the bottom arc reads \"CLEAN CODE WITHOUT BREAKING\nFUNCTIONALITY\" in smaller but clear font. Background is dark gradient from #000000 to\n#000f2a, with subtle glow and floating particles.\n[Animation Sequence]\n0s–1s:\n- Smooth zoom-in + fade-in of entire circular logo against black background.\n- \"CODE ALCHEMIST BOT\" text types out letter by letter with elegant typing effect (like a\nterminal cursor blinking).\n- Robot’s eyes pulse with green-blue glow, glasses reflect scrolling Lua code.\n1s–2s:\n- Obfuscated code icon slides in from left edge, Clean code icon slides in from right edge —\nboth stop at their positions.\n- Lime-green arrows draw themselves progressively around the robot (like being forged in\nfire), starting from obfuscated side and completing the circle.\n2s–3.5s:\n- Arrows begin rotating slowly clockwise (one full rotation).\n- Robot blinks once, then swings its light sword — triggering a shimmering “refactor wave”\nthat sweeps from obfuscated code to clean code.\n- Tiny green sparkles and code particles flow along the arrows, simulating syntax purification.\n- Subtle dynamic glow and drop shadow added to robot and icons for depth.\n3.5s–4.5s:\n- A glowing circular scan ring pulses outward from the center, tracing the outer edge of the\nlogo.\n- Text \"CLEAN CODE WITHOUT BREAKING FUNCTIONALITY\" pulses with synchronized\nbrightness (soft glow + fade).\n- Background subtly shifts color between #000000 and #000f2a (gentle gradient transition).\n4.5s–5s:\n- Arrows complete rotation and gently stop back in original position.\n- Robot gives a confident nod, emits a tiny “pop” flash of light from its sword tip. Background begins a very slow fade-out (not fully black, just dimming slightly) to prepare\r\nfor seamless loop.\r\n[Additional Effects]\r\n- Floating micro-particles in soft green and cyan drift gently across the background\r\nthroughout.\r\n- All animations are smooth, easing in/out, no sudden jumps.\r\n- Final frame must match first frame exactly for perfect loop in GIF format.\r\n- No sound. Clean, technical, magical aesthetic."
+    }]
+  }
+}
