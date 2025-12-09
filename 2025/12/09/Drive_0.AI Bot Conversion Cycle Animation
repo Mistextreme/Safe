@@ -1,0 +1,20 @@
+{
+  "runSettings": {
+    "model": "models/veo-2.0-generate-001",
+    "assetCount": 1,
+    "aspectRatio": "16:9",
+    "assetDuration": "8s",
+    "outputResolution": "1K"
+  },
+  "veoPrompt": {
+    "veoTurns": [{
+      "generatedVideos": [{
+        "driveVideo": {
+          "id": "1dZQKZiVK09bkTFiZTPqhNvAB8drA0SH-"
+        },
+        "aspectRatio": "16:9"
+      }],
+      "prompt": "Create a 5-second seamless looping animated video (24fps, 1024x1024 resolution, MP4\r\nformat, silent) based on this circular logo design:\r\n[Visual Description]\r\nA central cute blue robot with glowing cyan eyes, smiling face, and small antenna. On its left\r\nis a white document icon labeled \"QB\", on its right \"ESX\". Two curved orange arrows\r\nencircle the robot — one from QB to ESX at the bottom, another from ESX to QB at the top\r\n— forming a conversion cycle. The top arc reads \"AI BOT\" in bold white sans-serif font; the\r\nbottom arc reads \"QB-CORE TO ESX\" in same style. Background is dark blue (#001f3f) with\r\na soft outer glow ring in light blue (#007bff).\r\n[Animation Sequence]\r\n0s–1s:\r\n- Smooth zoom-in + fade-in of entire circular logo against black background.\r\n- \"AI BOT\" text types out letter by letter with subtle digital typing effect.\r\n- Robot’s eyes pulse with bright cyan glow (like LED lights turning on).\r\n1s–2s:\r\n- \"QB\" icon slides in from left edge, \"ESX\" icon slides in from right edge — both stop at their\r\npositions beside the robot.\r\n- Orange arrows draw themselves progressively around the robot (like being hand-drawn),\r\nstarting from QB side and completing the circle.\r\n2s–3.5s:\r\n- Arrows begin rotating slowly clockwise (one full rotation).\r\n- Robot blinks once (eyes dim then brighten) as if processing data.\r\n- Tiny cyan particles flow along the path of the arrows, simulating data stream.\r\n- Subtle dynamic glow and drop shadow added to robot and icons for depth.\r\n3.5s–4.5s:\r\n- A glowing circular scan ring pulses outward from the center, tracing the outer edge of the\r\nlogo.\r\n- Text \"QB-CORE TO ESX\" pulses with synchronized brightness (soft glow + fade).\r\n- Background subtly shifts color between #007bff and #00ccff (gentle gradient transition).\r\n4.5s–5s:\r\n- Arrows complete rotation and gently stop back in original position.\r\n- Robot blinks again and emits a small “pop” flash of light from its body.\r\n- Background begins a very slow fade-out (not fully black, just dimming slightly) to prepare\r\nfor seamless loop.\r\n[Additional Effects]\r\n- Floating micro-particles in soft blue tones drift gently across the background throughout.\r\n- All animations are smooth, easing in/out, no sudden jumps.\r\n- Final frame must match first frame exactly for perfect loop in GIF format.\r\n- No sound. Clean, modern, tech-inspired aesthetic."
+    }]
+  }
+}
