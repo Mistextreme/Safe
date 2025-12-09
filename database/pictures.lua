@@ -215,5 +215,25 @@ return {
     ["Redmi_tlm_52"] = {
         label = "Redmi_tlm_52",
         image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_52.jpg?token=AO2YHHE7WV3CZTWXY5GCMWDJG6WYO"
+    },
+    ["bg"] = {
+        label = "bg",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/bg.png?token=AO2YHHC7EQ3Y7TO4FVJPZZLJG6WZU"
+    },
+    ["bgRed"] = {
+        label = "bgRed",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/bgRed.png?token=AO2YHHD4CRRHJNXBCIXLTYDJG6WZU"
+    },
+    ["interact"] = {
+        label = "interact",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/interact.png?token=AO2YHHGAYDXHQCBS6S6YIWTJG6WZU"
+    },
+    ["interactRed"] = {
+        label = "interactRed",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/interactRed.png?token=AO2YHHHC2I54FLUZHB3QAQTJG6WZU"
+    },
+    ["pin"] = {
+        label = "pin",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/pin.png?token=AO2YHHHHZBDDBK2O63RKIGTJG6WZU"
     }
 }
