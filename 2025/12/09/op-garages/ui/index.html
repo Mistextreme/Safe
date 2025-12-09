@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <link href="./style.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:900|Work+Sans:300" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <script src="https://kit.fontawesome.com/9edb4eb6d8.js" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="./script.js"></script>
+    <script type="text/javascript" src="./functions.js"></script>
+</head>
+
+<body>
+    <div id="hint-cent" style="display: none;">
+        <h1 id="hint-text"></h1>
+    </div>
+
+    <h1 id="showroom-button" class="green" style="display: none;" onclick="enterShowroom()">Enter Showroom.</h1>
+
+    <div id="garage-container" style="display: none;">
+
+        <div id="garage-head">
+            <h1 id="garage-text"><i class="fa-solid fa-warehouse"></i> <span id="garage-head-translation">GARAŻ</span>
+            </h1>
+            <p id="cars-state">0/0</p>
+        </div>
+
+        <div id="garage-head-search-bar">
+            <div>
+                <input type="text" placeholder="Search Plate or Vehicle name." id="search-bar" onkeyup="search()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </div>
+
+        <div id="cars-container">
+            <div class="car" data-plate="sigma" data-label="AUDI RS5">
+                <div class="impounding-veh" id="impounding-veh-plate-" style="display: none;">
+                    <div id="center-impound">
+                        <div id="impound-stage-1" class="impound-stage-1" style="display: none;">
+                            <div class="lds-ring">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <h1 id="impounding-vehicle-text">Odholowywanie Pojazdu...</h1>
+                        </div>
+                        <div id="impound-stage-2" class="impound-stage-2">
+                            <div class="wrapper" id="yesmark" style="display: none;">
+                                <svg class="checkmark" viewBox="0 0 52 52">
+                                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                                </svg>
+                            </div>
+                            <div class="wrapper" id="nomark" style="display: none;">
+                                <svg class="checkmark2" viewBox="0 0 52 52">
+                                    <circle class="checkmark_circle2" cx="26" cy="26" r="25" fill="none" />
+                                    <path class="checkmark_check2" fill="none"
+                                        d="M14.1 14.1l23.8 23.8 m0,-23.8 l-23.8,23.8" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="car-image"
+                    style="background-image: url('https://files.libertycity.net/download/gta5_audi/thumbs/2021-12/audi-rs5-mansory-2021_1686009028_888955.jpg');">
+                </div>
+                <div id="car-bottom-content">
+                    <div class="flexBox gap10 justify">
+                        <h1 id="car-name"> <img
+                                src="https://static.wixstatic.com/media/f2bf43_fd166301e7aa405b980f5b38a7b256c9~mv2.png">
+                            <input type="text" value="AUDI RS5" class="carname-input" id="input-777RICH"
+                                onchange="updateCarLabel('777RICH')">
+                        </h1>
+                        <h1 id="plate">777 RICH</h1>
+                    </div>
+                    <div class="car-btns">
+                        <h1 onclick="takeCar('')" class="red">Odholuj</h1>
+                        <h1 onclick="showCar('')">Pokaż</h1>
+                        <h1 onclick="repairCar('')">Napraw</h1>
+                        <h1 onclick="addToFav('')"><i class="fa-regular fa-star"></i></h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vehicle-hints" style="display: none;">
+        <div class="shortcut">
+            <h1>T</h1>
+            <h1>to take vehicle.</h1>
+        </div>
+        <div class="shortcut">
+            <h1>L</h1>
+            <h1>to show list.</h1>
+        </div>
+    </div>
+</body>
+
+</html>
