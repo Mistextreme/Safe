@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Garage</title>
+    <link rel="stylesheet" href="assets/index.css" />
+  </head>
+  <body>
+    <div class="garage-main" style="display: none">
+      <div class="garage-container">
+        <div class="garage-container-leftbloc">
+          <div class="top-bar">
+            <h1 class="top-bar-title"></h1>
+            <div class="top-bar-search">
+              <input
+                type="search"
+                class="search-bar"
+                placeholder="Rechercher"
+              />
+              <div class="select-menu filter">
+                <div class="select rdr2-case-input">
+                  <label class="select-label"></label>
+                  <svg
+                    stroke="currentColor"
+                    fill="currentColor"
+                    stroke-width="0"
+                    viewBox="0 0 24 24"
+                    class="select-arrow"
+                    height="1em"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M11.9997 10.8284L7.04996 15.7782L5.63574 14.364L11.9997 8L18.3637 14.364L16.9495 15.7782L11.9997 10.8284Z"
+                    ></path>
+                  </svg>
+                </div>
+                <div class="options" style="display: none"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="garage-container-leftbloc-cards"></div>
+        </div>
+
+        <div class="garage-container-details"></div>
+      </div>
+    </div>
+
+    <script>
+  let vehicles = [];
+  let optionsList = [];
+
+  const cardsContainer = document.querySelector(
+    ".garage-container-leftbloc-cards"
+  );
+  const detailsContainer = document.querySelector(
+    ".garage-container-details"
+  );
+  const select = document.querySelector(".select");
+  const options = document.querySelector(".options");
+  const label = document.querySelector(".select-label");
+  const arrow = document.querySelector(".select-arrow");
+  const main = document.querySelector(".garage-main");
+  const searchBar = document.querySelector(".search-bar");
+  const title = document.querySelector(".top-bar-title");
+
+  let currentMode = "";
+  let searchValue = "";
+
+  function createVehicleCard(vehicle, mode) {
+  const card = document.createElement("div");
+  card.className = "card-container card-container--out";
+
+  const isDisabled = 
+    vehicle.isDisabled || 
+    (mode === "Entreprise" && vehicle.location === "Fourrière") ||
+    (mode === "Personnel" && vehicle.stored === false);
+
+  if (isDisabled) card.classList.add("disabled");
+  
+  const garageInfo = mode === "Fourrière" && vehicle.garage_origin 
+    ? `<div style="color: #ffa500; font-size: 11px; margin-top: 3px;">${vehicle.garage_origin}</div>`
+    : '';
+    
+  card.innerHTML = `
+    <div class="vehicle-name">
+      <span class="vehicle-name--name">${vehicle.name}</span>
+      <div class="vehicle-name--details">
+        <span class="vehicle-name--spawner">${vehicle.model}</span> -
+        <span class="vehicle-name--id">${vehicle.id}</span>
+      </div>
+      ${garageInfo}
+    </div>
+    <div class="carimg">
+      <img src="${vehicle.img}" alt="${vehicle.name}" loading="lazy"/>
+    </div>
+    <div class="button-container">
+      <div class="details-button details-button--details"><label>Détails</label></div>
+      <div class="details-button ${
+        isDisabled
+          ? "details-button--takeout disabled"
+          : "details-button--takeout"
+      }" onclick="${
+    isDisabled ? "" : `takeOutVehicle(${vehicle.id})`
+  }"><label>${mode === "Fourrière" ? 'Récupérer' : (vehicle.stored === false ? 'Déjà sorti' : 'Sortir le Véhicule')}</label></div>
+    </div>
+  `;
+
+  card
+    .querySelector(".details-button--details")
+    .addEventListener("click", () => showVehicleDetails(vehicle));
+
+  cardsContainer.appendChild(card);
+}
+
+  function showVehicleDetails(vehicle) {
+    detailsContainer.innerHTML = `
+      <div class="vehicle-details">
+        <div class="vehicle-details-img">
+          <img src="${vehicle.img}" alt="${vehicle.name}" loading="lazy" />
+        </div>
+        <div class="vehicle-details-txt">
+          <input class="vehicle-details-txt--name" max="25" value="${
+            vehicle.name
+          }" />
+          <span class="vehicle-details-txt--brand">${vehicle.brand}</span>
+        </div>
+
+        <div class="performances">
+          ${createPerfCard("Vitesse max", vehicle.stats.speed)}
+          ${createPerfCard("Accélération", vehicle.stats.accel)}
+          ${createPerfCard("Frein", vehicle.stats.brake)}
+          ${createPerfCard("Suspension", vehicle.stats.susp)}
+        </div>
+
+        <div class="vehicle-details-info">
+          <div class="vehicle-details-infos">
+            <label class="vehicle-details-infos--title">Plaque véhicule</label>
+            <label class="vehicle-details-infos--details">${
+              vehicle.plate
+            }</label>
+          </div>
+          <div class="vehicle-details-infos">
+            <label class="vehicle-details-infos--title">Propriétaire</label>
+            <label class="vehicle-details-infos--details">${
+              vehicle.owner
+            }</label>
+          </div>
+          <div class="vehicle-details-infos">
+            <label class="vehicle-details-infos--title">ID véhicule</label>
+            <label class="vehicle-details-infos--details">${vehicle.id}</label>
+          </div>
+        </div>
+
+        <div class="vehicle-details-buttons">
+          <div class="vehicle-details-getout">
+            <label class="vehicle-details-getout-button">Sortir le Véhicule</label>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function takeOutVehicle(id) {
+    fetch("https://" + GetParentResourceName() + "/takeout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    });
+  }
+
+  function createPerfCard(label, percent) {
+    const activeBars = Math.round(percent / 10);
+    const bars = Array.from({ length: 10 })
+      .map((_, i) =>
+        i < activeBars
+          ? `<div class="jauge-bar-fill jauge-bar-fill--active"></div>`
+          : `<div class="jauge-bar-fill"></div>`
+      )
+      .join("");
+
+    return `
+      <div class="performances-card">
+        <div class="performances-card-img">
+          <img src="./assets/${label
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[^\w\s]/gi, "")}.svg" loading="lazy" />
+        </div>
+        <div class="perf-jauge">
+          <label>${label}</label>
+          <div class="jauge-bar">
+            <div class="jauge-bar-value" style="flex-grow:1">${bars}</div>
+            <div class="jauge-bar-value">${percent}%</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+function renderVehicles(mode = "Entreprise") {
+  cardsContainer.innerHTML = "";
+  let count = 0;
+
+  vehicles.forEach((v) => {
+    const location = v.location || "entreprise";
+    const locations = Array.isArray(location)
+      ? location.map((loc) => loc.toLowerCase())
+      : [location.toLowerCase()];
+
+    if (!locations.includes(mode.toLowerCase())) return;
+
+    const isDisabled = 
+      (locations.includes("fourrière") && mode.toLowerCase() !== "fourrière") ||
+      v.stored === 0;
+
+    if (searchValue) {
+      const search = searchValue.toLowerCase();
+      if (
+        !v.name.toLowerCase().includes(search) &&
+        !v.model.toLowerCase().includes(search) &&
+        !v.id.toString().includes(search)
+      ) {
+        return;
+      }
+    }
+
+    const vehicleToRender = { ...v, isDisabled };
+    createVehicleCard(vehicleToRender, mode);
+    count++;
+  });
+
+  if (count === 0) {
+    const noVeh = document.createElement("div");
+    noVeh.className = "no-vehicles";
+    noVeh.textContent = "Aucun véhicule dans cette catégorie";
+    cardsContainer.appendChild(noVeh);
+  }
+}
+
+  function renderGarage(garage) {
+    title.innerHTML = garage.name || "Garage";
+    options.innerHTML = "";
+
+    const types = garage.types || ["Entreprise"];
+    
+    if (garage.isImpound) {
+      select.style.display = "none";
+      currentMode = "Fourrière";
+      renderVehicles("Fourrière");
+      return;
+    } else {
+      select.style.display = "flex";
+    }
+    
+    types.forEach((t) => {
+      const option = document.createElement("div");
+      option.className = "option";
+      option.innerHTML = `<label>${t}</label>`;
+      option.addEventListener("click", () => {
+        label.textContent = t;
+        options.classList.remove("active");
+        arrow.style.transform = "rotate(90deg)";
+        currentMode = t;
+        renderVehicles(currentMode);
+        options.style.display = "none";
+      });
+      options.appendChild(option);
+    });
+    label.textContent = garage.types[0];
+    optionsList = garage.types;
+    renderVehicles(garage.types[0]);
+  }
+
+  select.addEventListener("click", () => {
+    if (options.style.display === "none" || options.style.display === "") {
+      options.style.display = "block";
+      arrow.style.transform = "rotate(180deg)";
+    } else {
+      options.style.display = "none";
+      arrow.style.transform = "rotate(90deg)";
+    }
+  });
+
+  document.querySelectorAll(".option").forEach((opt) => {
+    opt.addEventListener("click", () => {
+      label.textContent = opt.textContent;
+      options.classList.remove("active");
+      arrow.style.transform = "rotate(90deg)";
+      currentMode = opt.textContent;
+      renderVehicles(currentMode);
+      options.style.display = "none";
+    });
+  });
+
+  searchBar.addEventListener("input", (e) => {
+    searchValue = e.target.value.trim();
+    renderVehicles(currentMode);
+  });
+
+  renderVehicles("Entreprise");
+
+  window.addEventListener("message", (event) => {
+    if (event.data.action === "open") {
+      main.style.display = "flex";
+      if (event.data.vehicles) {
+        vehicles = event.data.vehicles;
+        renderVehicles("Entreprise");
+        console.log(JSON.stringify(event.data.garage));
+        renderGarage(event.data.garage);
+      }
+    } else if (event.data.action === "updateVehicles") {
+      if (event.data.vehicles) {
+        vehicles = event.data.vehicles;
+        renderVehicles(currentMode);
+      }
+    } else if (event.data.action === "close") {
+      main.style.display = "none";
+    }
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      fetch("https://" + GetParentResourceName() + "/close", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+  });
+</script>
+
+  </body>
+</html>
