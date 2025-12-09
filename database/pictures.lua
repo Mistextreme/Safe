@@ -331,5 +331,289 @@ return {
     ["Drive_40"] = {
         label = "Drive_40",
         image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_40.jpg?token=AO2YHHDPCM43Q4HHSGPGWXDJG6ZRS"
+    },
+    ["Generated_Image_December_03__2025_-_10_41AM_new"] = {
+        label = "Generated_Image_December_03__2025_-_10_41AM_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Generated%20Image%20December%2003%2C%202025%20-%2010_41AM.png?token=AO2YHHFEJYWQ6EA5JTLZK6LJG6ZUC"
+    },
+    ["IMG_20251126_201101_new"] = {
+        label = "IMG_20251126_201101_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251126_201101.png?token=AO2YHHGYOTEFLZCER54EFYDJG6ZUC"
+    },
+    ["IMG_20251126_201146_new"] = {
+        label = "IMG_20251126_201146_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251126_201146.png?token=AO2YHHEZYRWJMJBMV2BDXMLJG6ZUC"
+    },
+    ["IMG_20251203_104326_new"] = {
+        label = "IMG_20251203_104326_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/IMG_20251203_104326.png?token=AO2YHHBS3AJKWDK2QSLE2E3JG6ZUC"
+    },
+    ["Photoroom-20251204_231639462_new"] = {
+        label = "Photoroom-20251204_231639462_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom-20251204_231639462.png?token=AO2YHHFHTXLPTBQM3AABM2DJG6ZUC"
+    },
+    ["Photoroom-20251204_231944385_new"] = {
+        label = "Photoroom-20251204_231944385_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom-20251204_231944385.png?token=AO2YHHDLUQEMHSWKBFJJF2LJG6ZUC"
+    },
+    ["Redmi_tlm_new"] = {
+        label = "Redmi_tlm_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm.jpg?token=AO2YHHHU22IF2Z6XNVTXIS3JG6ZUC"
+    },
+    ["Redmi_tlm_0_new"] = {
+        label = "Redmi_tlm_0_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm_0.jpg?token=AO2YHHBP73SCFENOIQYWCP3JG6ZUC"
+    },
+    ["Redmi_tlm_1_new"] = {
+        label = "Redmi_tlm_1_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm_1.png?token=AO2YHHFSW4RLTFRF5B5JR3TJG6ZUC"
+    },
+    ["Redmi_tlm_2_new"] = {
+        label = "Redmi_tlm_2_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm_2.png?token=AO2YHHCSD62RR2GLJIK6PKLJG6ZUC"
+    },
+    ["Redmi_tlm_3_new"] = {
+        label = "Redmi_tlm_3_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm_3.png?token=AO2YHHBJIDUMADOJ4A7SRQ3JG6ZUC"
+    },
+    ["Redmi_tlm_4_new"] = {
+        label = "Redmi_tlm_4_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Redmi_tlm_4.jpg?token=AO2YHHCBIK5UPVEUWOTX6KTJG6ZUC"
+    },
+    ["Screenshot_2025-12-01-09-50-57-086_com_rarlab_rar_new"] = {
+        label = "Screenshot_2025-12-01-09-50-57-086_com_rarlab_rar_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-01-09-50-57-086_com.rarlab.rar.jpg?token=AO2YHHEXBTCW6BVYDP6YFSTJG6ZUC"
+    },
+    ["Screenshot_2025-12-03-03-28-02-216_com_google_android_apps_docs_new"] = {
+        label = "Screenshot_2025-12-03-03-28-02-216_com_google_android_apps_docs_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-03-03-28-02-216_com.google.android.apps.docs.jpg?token=AO2YHHGPWIF2SN3P2NCVW7LJG6ZUC"
+    },
+    ["Screenshot_2025-12-04-23-19-42-258_com_photoroom_app_new"] = {
+        label = "Screenshot_2025-12-04-23-19-42-258_com_photoroom_app_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-04-23-19-42-258_com.photoroom.app.jpg?token=AO2YHHAU2BGEAFFPHFAXK3TJG6ZUC"
+    },
+    ["Screenshot_2025-12-09-02-09-06-970_com_miui_home_new"] = {
+        label = "Screenshot_2025-12-09-02-09-06-970_com_miui_home_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Screenshot_2025-12-09-02-09-06-970_com.miui.home.jpg?token=AO2YHHGMSBNNA5E2TBGKFSDJG6ZUC"
+    },
+    ["hbIzdZDNDzS4_new"] = {
+        label = "hbIzdZDNDzS4_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/hbIzdZDNDzS4.png?token=AO2YHHCIHFHVAQQRWCCL2QTJG6ZUC"
+    },
+    ["img_or1908230328_0004_new"] = {
+        label = "img_or1908230328_0004_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/img_or1908230328_0004.jpg?token=AO2YHHGL436HVLWDAIDSLNDJG6ZUC"
+    },
+    ["Redmi_tlm_10_new"] = {
+        label = "Redmi_tlm_10_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_10.jpg?token=AO2YHHD64SMZM5DA56HR643JG6ZUC"
+    },
+    ["Redmi_tlm_11_new"] = {
+        label = "Redmi_tlm_11_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_11.jpg?token=AO2YHHGA5UFW3YS4X5UZLVLJG6ZUC"
+    },
+    ["Redmi_tlm_12_new"] = {
+        label = "Redmi_tlm_12_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_12.jpg?token=AO2YHHDOW2NY55FK53DJWZTJG6ZUC"
+    },
+    ["Redmi_tlm_13_new"] = {
+        label = "Redmi_tlm_13_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_13.jpg?token=AO2YHHCXM26ERQDRIE62643JG6ZUC"
+    },
+    ["Redmi_tlm_14_new"] = {
+        label = "Redmi_tlm_14_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_14.jpg?token=AO2YHHAGYLLZTWSOSBW7353JG6ZUC"
+    },
+    ["Redmi_tlm_15_new"] = {
+        label = "Redmi_tlm_15_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_15.jpg?token=AO2YHHB4PZSNBYVVXPBQD7DJG6ZUC"
+    },
+    ["Redmi_tlm_16_new"] = {
+        label = "Redmi_tlm_16_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_16.jpg?token=AO2YHHBNXLSOIUIQCQAXZIDJG6ZUC"
+    },
+    ["Redmi_tlm_17_new"] = {
+        label = "Redmi_tlm_17_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_17.jpg?token=AO2YHHGTFNHXX34YBIF36I3JG6ZUC"
+    },
+    ["Redmi_tlm_18_new"] = {
+        label = "Redmi_tlm_18_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_18.jpg?token=AO2YHHD4XDSNNAN3XEUUUHLJG6ZUC"
+    },
+    ["Redmi_tlm_19_new"] = {
+        label = "Redmi_tlm_19_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_19.jpg?token=AO2YHHGIWRRSPGPVNPX7WY3JG6ZUC"
+    },
+    ["Redmi_tlm_20_new"] = {
+        label = "Redmi_tlm_20_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_20.jpg?token=AO2YHHGPRTFIW5IKPD6XMSTJG6ZUC"
+    },
+    ["Redmi_tlm_21_new"] = {
+        label = "Redmi_tlm_21_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_21.jpg?token=AO2YHHD7J6RLVU6FWMTDTXDJG6ZUC"
+    },
+    ["Redmi_tlm_22_new"] = {
+        label = "Redmi_tlm_22_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_22.jpg?token=AO2YHHERMA2K5GT3HZGSEP3JG6ZUC"
+    },
+    ["Redmi_tlm_23_new"] = {
+        label = "Redmi_tlm_23_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_23.jpg?token=AO2YHHG73KXQU4TE7CWREOTJG6ZUC"
+    },
+    ["Redmi_tlm_24_new"] = {
+        label = "Redmi_tlm_24_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_24.jpg?token=AO2YHHFQFRQQIZJY7EGI5ZDJG6ZUC"
+    },
+    ["Redmi_tlm_25_new"] = {
+        label = "Redmi_tlm_25_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_25.jpg?token=AO2YHHER3QTIG2RBNBGETZDJG6ZUC"
+    },
+    ["Redmi_tlm_26_new"] = {
+        label = "Redmi_tlm_26_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_26.jpg?token=AO2YHHEVPLDFHQX6RBUHOP3JG6ZUC"
+    },
+    ["Redmi_tlm_27_new"] = {
+        label = "Redmi_tlm_27_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_27.jpg?token=AO2YHHDYMDV4IWQLAAW5VULJG6ZUC"
+    },
+    ["Redmi_tlm_28_new"] = {
+        label = "Redmi_tlm_28_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_28.jpg?token=AO2YHHDGEEIBWHPIIDOSQDLJG6ZUC"
+    },
+    ["Redmi_tlm_29_new"] = {
+        label = "Redmi_tlm_29_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_29.jpg?token=AO2YHHHAW43UHL6HF37KNVDJG6ZUC"
+    },
+    ["Redmi_tlm_30_new"] = {
+        label = "Redmi_tlm_30_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_30.jpg?token=AO2YHHG6GWMHREBLOXUXQYLJG6ZUC"
+    },
+    ["Redmi_tlm_31_new"] = {
+        label = "Redmi_tlm_31_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_31.jpg?token=AO2YHHDZMDZYMEUQGSNPKWTJG6ZUC"
+    },
+    ["Redmi_tlm_32_new"] = {
+        label = "Redmi_tlm_32_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_32.jpg?token=AO2YHHH27R7PQU5TDVT7733JG6ZUC"
+    },
+    ["Redmi_tlm_33_new"] = {
+        label = "Redmi_tlm_33_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_33.jpg?token=AO2YHHBZZLY2EASJWVQCIBDJG6ZUC"
+    },
+    ["Redmi_tlm_34_new"] = {
+        label = "Redmi_tlm_34_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_34.jpg?token=AO2YHHBELTTNEK47MYEVT5DJG6ZUC"
+    },
+    ["Redmi_tlm_35_new"] = {
+        label = "Redmi_tlm_35_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_35.jpg?token=AO2YHHEGQQ2NXWXI7MOGYXTJG6ZUC"
+    },
+    ["Redmi_tlm_36_new"] = {
+        label = "Redmi_tlm_36_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_36.jpg?token=AO2YHHHOURSL7B3K3OAM2YTJG6ZUC"
+    },
+    ["Redmi_tlm_37_new"] = {
+        label = "Redmi_tlm_37_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_37.jpg?token=AO2YHHGPRHVK6J35TBGXDYDJG6ZUC"
+    },
+    ["Redmi_tlm_38_new"] = {
+        label = "Redmi_tlm_38_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_38.jpg?token=AO2YHHCCVZS67RWPY3TN3K3JG6ZUC"
+    },
+    ["Redmi_tlm_39_new"] = {
+        label = "Redmi_tlm_39_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_39.jpg?token=AO2YHHBQ4E7ABBSZTQCTS6LJG6ZUC"
+    },
+    ["Redmi_tlm_40_new"] = {
+        label = "Redmi_tlm_40_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_40.jpg?token=AO2YHHG6DYCPXQ2F2KG76BDJG6ZUC"
+    },
+    ["Redmi_tlm_41_new"] = {
+        label = "Redmi_tlm_41_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_41.jpg?token=AO2YHHE2YWZF4DFQ23OKMZLJG6ZUC"
+    },
+    ["Redmi_tlm_42_new"] = {
+        label = "Redmi_tlm_42_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_42.jpg?token=AO2YHHFKP5L2F6O4PJ2BVMLJG6ZUC"
+    },
+    ["Redmi_tlm_43_new"] = {
+        label = "Redmi_tlm_43_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_43.jpg?token=AO2YHHA5AD3VTCRROEGEC33JG6ZUC"
+    },
+    ["Redmi_tlm_44_new"] = {
+        label = "Redmi_tlm_44_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_44.jpg?token=AO2YHHCXOY75MSSQFUWPVR3JG6ZUC"
+    },
+    ["Redmi_tlm_45_new"] = {
+        label = "Redmi_tlm_45_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_45.jpg?token=AO2YHHA2M4ZEASEXSFSPKALJG6ZUC"
+    },
+    ["Redmi_tlm_46_new"] = {
+        label = "Redmi_tlm_46_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_46.jpg?token=AO2YHHC54J6DDJ4H6K5CAOTJG6ZUC"
+    },
+    ["Redmi_tlm_47_new"] = {
+        label = "Redmi_tlm_47_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_47.jpg?token=AO2YHHDNRVN32TFDISNNBGLJG6ZUC"
+    },
+    ["Redmi_tlm_48_new"] = {
+        label = "Redmi_tlm_48_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_48.jpg?token=AO2YHHAWMO5JJJMGSNWVZ6TJG6ZUC"
+    },
+    ["Redmi_tlm_49_new"] = {
+        label = "Redmi_tlm_49_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_49.jpg?token=AO2YHHH2DKHK6NPUVQ3KEGTJG6ZUC"
+    },
+    ["Redmi_tlm_50_new"] = {
+        label = "Redmi_tlm_50_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_50.jpg?token=AO2YHHGQDFMP56ZITXNBNVTJG6ZUC"
+    },
+    ["Redmi_tlm_51_new"] = {
+        label = "Redmi_tlm_51_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_51.jpg?token=AO2YHHAAFNWGVFZJQSI4V6DJG6ZUC"
+    },
+    ["Redmi_tlm_52_new"] = {
+        label = "Redmi_tlm_52_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_52.jpg?token=AO2YHHFTAWX3LFK2OY3XAT3JG6ZUC"
+    },
+    ["Redmi_tlm_9_new"] = {
+        label = "Redmi_tlm_9_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/.thumbnails/Redmi_tlm_9.jpg?token=AO2YHHHDZCM7X2EKF64RJ5LJG6ZUC"
+    },
+    ["bg_new"] = {
+        label = "bg_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/bg.png?token=AO2YHHH7PIAC5SEWTTXPY63JG6ZUO"
+    },
+    ["bgRed_new"] = {
+        label = "bgRed_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/bgRed.png?token=AO2YHHH3PN4JS2RILJRPRXDJG6ZUO"
+    },
+    ["interact_new"] = {
+        label = "interact_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/interact.png?token=AO2YHHGD6H3B36GMPCUIGMDJG6ZUO"
+    },
+    ["interactRed_new"] = {
+        label = "interactRed_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/interactRed.png?token=AO2YHHE3TRJW4AWONVO5QWLJG6ZUO"
+    },
+    ["pin_new"] = {
+        label = "pin_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/j-textui-main/assets/pin.png?token=AO2YHHFFEASP4LKYXGWN25DJG6ZUO"
+    },
+    ["Redmi_tlm_6_new"] = {
+        label = "Redmi_tlm_6_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom/Redmi_tlm_6.png?token=AO2YHHCLKSZH5C4CHWQ2ZCTJG6ZUE"
+    },
+    ["Redmi_tlm_7_new"] = {
+        label = "Redmi_tlm_7_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom/Redmi_tlm_7.png?token=AO2YHHFWGEUOZOBQU3VEF7TJG6ZUE"
+    },
+    ["Redmi_tlm_8_new"] = {
+        label = "Redmi_tlm_8_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Photoroom/Redmi_tlm_8.png?token=AO2YHHDS4R3NU6Q2436VGUTJG6ZUE"
+    },
+    ["Redmi_tlm_5_new"] = {
+        label = "Redmi_tlm_5_new",
+        image = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Tomato/Redmi_tlm_5.jpg?token=AO2YHHCASAROA56KIK2YLX3JG6ZUFAA"
     }
 }
