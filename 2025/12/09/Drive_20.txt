@@ -1,0 +1,766 @@
+<source type="github_repository"><commit>fd7bce35bdd2a611146e7bd81189725b6fb091b4</commit>
+<file name="README.md"># FiveM Tow Rope Script
+
+#### ⭐ Check out our other resources on [gamzkystore.com](https://gamzkystore.com/) or in our [Discord](https://discord.com/invite/sjFP3HrWc3).
+####  Preview video: [Youtube](https://www.youtube.com/watch?v=BaFidbF3mhA)
+
+With our recent flatbed script release, a lot of requests were made to make a towing script as well, which could be used together. Well, here it is! There is a big focus is synchronization, since this is a common issue for scripts using ropes. Winch functionality is also included and synchronized.
+
+## Features
+- Actions are fully synchronized between players and optimized for performance. You can use the same ropes and vehicles with multiple people.
+- Includes winch functionality, press the arrow-up key to toggle this feature when driving a vehicle with a rope attached.
+- The script is standalone and has no dependencies, optional job requirements are implemented for esx and qbcore.
+- You can add a rope/winch to any vehicle by adding it to the configuration.
+- Many other configurable options, like key bindings, labels, notifications and more.
+- Usage of animations and props to enhance immersion.
+- Works together with our free flatbed script, which can be found on our website as well: https://gamzkystore.com/.</file>
+<file name="config.js">Config = {};
+
+// Only these jobs can interact with the tow rope. Supports ESX and QBCore by default. If using a different framework, edit cl_playerjob.js.
+Config.RequiredJobs = ['police', 'mechanic'];
+
+// The keys through which the player controls the rope.
+Config.Keys = {
+	interact: 38,      // E key, also change keyIndicator below in Config.Locales
+	cancel: 73,        // X key
+	wind: 172,         // Arrow Up key
+};
+
+// All vehicles below have a tow rope that can be used. The x-y-z coordinates are the location with respect to the center of the vehicle, where to rope can be picked up.
+Config.TowVehicles = {
+	[GetHashKey('flatbed')]: [0.0, 0.9, 0.6],
+	[GetHashKey('kamacho')]: [0.0, 2.6, 0.3],
+	[GetHashKey('mesa3')]: [0.0, 2.2, 0.0],
+};
+
+// If you are using our flatbed script (https://gamzkystore.com/free-package/flatbed-script) and the flatbed is lowered, the rope attach point changes.
+// This only works for the vehicle model defined under Config.FlatbedModel.
+Config.FlatbedModel = GetHashKey('flatbed');
+Config.FlatbedLowerd = [0.0, -3.5, 0.8];
+
+// All labels and notifications are defined below.
+Config.Locales = {
+	rope: 'Towrope',
+	cancel: 'Cancel',
+	remove: 'Remove',
+	attachCable: 'Attach Cable',
+	keyIndicator: '[~b~E~s~] ',
+	ropeTurnedOn: 'Winch ~b~turned on~s~.',
+	ropeTurnedOff: 'Winch ~b~turned off~s~.',
+	vehicleIsAttached: '~r~Cannot attach the rope to a vehicle that is already attached to another object.',
+};
+
+// The minimum and maximum rope length, recommendation is to keep this as is.
+Config.MaxRopeLength = 25.0;
+Config.MinimumRopeLength = 2.0;
+
+</file>
+<file name="fxmanifest.lua">fx_version 'cerulean'
+games { 'gta5' }
+
+author 'Eviate'
+description 'Tow Rope Script'
+version '1.0.1'
+
+shared_scripts {
+	'config.js',
+}
+
+client_scripts {
+	'client/cl_*.js',
+}
+
+server_scripts {
+	'sv_main.js',
+}
+</file>
+<file name="sv_main.js">let ESX = null;
+let QBCore = null;
+
+if (GetResourceState('es_extended') == 'started') {
+    ESX = exports['es_extended'].getSharedObject();
+} else if (GetResourceState('qb-core') == 'started') {
+    QBCore = exports['qb-core'].GetCoreObject();
+}
+
+const CanUseTowrope = (playerId) =&gt; {
+    // If no required jobs are set, allow all players
+    if (!Config.RequiredJobs || Config.RequiredJobs.length === 0) {
+        return true;
+    }
+
+    let playerJobName = null;
+
+    if (ESX) {
+        const xPlayer = ESX.GetPlayerFromId(playerId);
+        if (xPlayer &amp;&amp; xPlayer.job &amp;&amp; xPlayer.job.name) {
+            playerJobName = xPlayer.job.name;
+        }
+    } else if (QBCore) {
+        const Player = QBCore.Functions.GetPlayer(playerId);
+        if (Player &amp;&amp; Player.PlayerData &amp;&amp; Player.PlayerData.job &amp;&amp; Player.PlayerData.job.name) {
+            playerJobName = Player.PlayerData.job.name;
+        }
+    }
+
+    // If we couldn't get the job, deny access
+    if (!playerJobName) {
+        return false;
+    }
+
+    // Check if the player's job is in the required jobs array
+    return Config.RequiredJobs.includes(playerJobName);
+};
+
+
+onNet('gs_towrope:AttachRope', (vehicleNetId, attachedVehicleNetId, yOffsetSign) =&gt; {
+	const src = source;
+
+	if (!CanUseTowrope(src)) return;
+
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) return;
+
+	Entity(vehicle).state.RopeAttachedVehicle = [attachedVehicleNetId, yOffsetSign];
+});
+
+onNet('gs_towrope:DetachRope', (vehicleNetId) =&gt; {
+	const src = source;
+
+	if (!CanUseTowrope(src)) return;
+
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	Entity(vehicle).state.RopeAttachedVehicle = null;
+});
+
+onNet('gs_towrope:StartWindRope', (vehicleNetId, attachedVehicleNetId) =&gt; {
+	const src = source;
+
+	// Check if the vehicle exists
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	// Check if the attached vehicle exists
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) return;
+
+	// Start the winding on the entity owner
+	const entityOwner = NetworkGetEntityOwner(attachedVehicle);
+	emitNet('gs_towrope:StartWindRopeClient', entityOwner, vehicleNetId);
+});
+
+onNet('gs_towrope:StopWindRope', (vehicleNetId, attachedVehicleNetId, yOffsetSign) =&gt; {
+	const src = source;
+
+	// Check if the vehicle exists
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	// Check if the attached vehicle exists
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) return;
+
+	// Stop the winding on the entity owner
+	const entityOwner = NetworkGetEntityOwner(attachedVehicle);
+	emitNet('gs_towrope:StopWindRopeClient', entityOwner, vehicleNetId);
+
+	// Ensure all the clients have the same rope length
+	emitNet('gs_towrope:RopeResetLenghtClient', -1, vehicleNetId, attachedVehicleNetId, yOffsetSign);
+});
+
+onNet('gs_towrope:RopeResetLength', (vehicleNetId, attachedVehicleNetId, yOffsetSign) =&gt; {
+	const src = source;
+
+	// Check if the vehicle exists
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	// Check if the attached vehicle exists
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) return;
+
+	// Ensure all the clients have the same rope length
+	emitNet('gs_towrope:RopeResetLenghtClient', -1, vehicleNetId, attachedVehicleNetId, yOffsetSign);
+});
+</file>
+<file name="client/cl_functions.js">Functions = {};
+
+Functions.IsPlayerDead = () =&gt; {
+	const ped = PlayerPedId()
+	let isDead = IsEntityDead(ped)
+	return isDead
+}
+
+Functions.GetClosestVehicle = ({ coords, range }) =&gt; {
+	const _range = range || 9999;
+    const _coords = coords || GetEntityCoords(PlayerPedId());
+    let [closestDist, closestEntity] = [0, 0];
+    const GamePool = GetGamePool('CVehicle');
+    for (let i = 0; i &lt; GamePool.length; i++) {
+        const entCoords = GetEntityCoords(GamePool[i]);
+            const entDist = Functions.CalcDist(_coords, entCoords);
+            if (entDist &lt; _range &amp;&amp; (closestDist == 0 || closestDist &gt; entDist)) {
+                closestEntity = GamePool[i];
+                closestDist = entDist;
+            }
+    }
+    return closestEntity;
+};
+
+Functions.PlayAnim = async (ped, dict, anim, options) =&gt; {
+	const { blend, infinite, flag } = options;
+	RequestAnimDict(dict);
+	while (!HasAnimDictLoaded(dict)) {
+		await Delay(50);
+	}
+	const duration = infinite == true ? -1 : GetAnimDuration(dict, anim) * 1000;
+	TaskPlayAnim(ped, dict, anim, blend || 8.0, blend || 8.0, duration, flag || 1, 1.0);
+	RemoveAnimDict(dict);
+};
+
+Functions.LoadModel = (model) =&gt; {
+	const modelHash = Functions.GetModelHash(model);
+	const isModelValid = Functions.IsModelValid(modelHash);
+	if (isModelValid) {
+		return new Promise(async (resolve, reject) =&gt; {
+			RequestModel(modelHash);
+			while (!HasModelLoaded(modelHash)) {
+				await Delay(50);
+			}
+			resolve();
+		});
+	}
+};
+
+Functions.GetModelHash = (model) =&gt; {
+	return typeof model == 'string' ? GetHashKey(model) : model;
+};
+
+Functions.IsModelValid = (model) =&gt; {
+	const modelHash = Functions.GetModelHash(model);
+	return Boolean(IsModelInCdimage(modelHash) &amp;&amp; IsModelValid(modelHash));
+};
+
+Functions.ShowNotification = ({ message }) =&gt; {
+	BeginTextCommandThefeedPost('STRING');
+	AddTextComponentSubstringPlayerName(message);
+	EndTextCommandThefeedPostTicker(false, true);
+};
+
+Functions.CalcDist = (coords1, coords2) =&gt; {
+	const xDist = coords1[0] - coords2[0];
+	const yDist = coords1[1] - coords2[1];
+	const zDist = coords1[2] - coords2[2];
+	return Math.sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+};
+
+const Delay = (ms) =&gt; new Promise((resolve) =&gt; setTimeout(resolve, ms));
+
+function DrawText3D(coords, text) {
+	const [x, y, z] = coords;
+	const [onScreen, screenX, screenY] = GetScreenCoordFromWorldCoord(x, y, z);
+
+	if (onScreen) {
+		const width = text.length / 400;
+
+		SetTextScale(0.35, 0.35);
+		SetTextFont(4);
+		SetTextColour(255, 255, 255, 225);
+		SetTextCentre(true);
+		BeginTextCommandDisplayText('STRING');
+		AddTextComponentSubstringPlayerName(text);
+		EndTextCommandDisplayText(screenX, screenY);
+		DrawRect(screenX, screenY + 0.0125, width + 0.015, 0.03, 40, 10, 40, 70);
+	}
+}</file>
+<file name="client/cl_main.js">let roping = false;
+let carriedRope = null;
+let hookProp = null;
+
+setTick(async () =&gt; {
+	let ms = 1000;
+
+	// Ensure correct job
+	if (Config.RequiredJobs &amp;&amp; Config.RequiredJobs.length &gt; 0) {
+		const playerJob = GetPlayerJob();
+		if (!Config.RequiredJobs.includes(playerJob)) {
+			await Delay(ms);
+			return;
+		}
+	}
+
+	// Ensure player is not in a vehicle
+	const ped = PlayerPedId();
+	if (IsPedInAnyVehicle(ped, true)) {
+		await Delay(ms);
+		return;
+	}
+
+	// Ensure player is not dead
+	if (Functions.IsPlayerDead()) {
+		await Delay(ms);
+		return;
+	}
+
+	// Check for a vehicle
+	const pedCoords = GetEntityCoords(ped, true);
+	let vehicle = Functions.GetClosestVehicle({
+		coords: pedCoords,
+		range: 5,
+	});
+
+	if (!DoesEntityExist(vehicle)) {
+		await Delay(ms);
+		return;
+	}
+
+	// Ensure vehicle is not broken down
+	if (GetVehicleEngineHealth(vehicle) &lt;= 100.0) {
+		await Delay(ms);
+		return;
+	}
+
+	// Check the vehicle class
+	const vehicleModel = GetEntityModel(vehicle);
+	if (Config.TowVehicles[vehicleModel] == null) {
+		await Delay(ms);
+		return;
+	}
+
+	// Define the pickup coords
+	let TowVehicleCoords = Config.TowVehicles[vehicleModel];
+	if (TowVehicleCoords == Config.TowVehicles[Config.FlatbedModel] &amp;&amp; Entity(vehicle).state.bedLowered) TowVehicleCoords = Config.FlatbedLowerd;
+
+	// Ensure the player is close to the attach point
+	const offsetCoords = GetOffsetFromEntityInWorldCoords(vehicle, ...TowVehicleCoords);
+	const dist = Functions.CalcDist(pedCoords, offsetCoords);
+	if (dist &gt; 1.5) {
+		await Delay(ms);
+		return;
+	}
+
+	// Slow down tick
+	ms = 0;
+
+	// Display the correct text
+	const ropeAttachedVehicle = Entity(vehicle).state.RopeAttachedVehicle != null;
+	let text = roping ? Config.Locales['cancel'] : Config.Locales['rope'];
+	text = ropeAttachedVehicle ? Config.Locales['remove'] : text;
+	text = dist &lt; 1 ? Config.Locales['keyIndicator'] + text : text;
+	DrawText3D(offsetCoords, text);
+
+	// Click handler
+	if (dist &lt; 1 &amp;&amp; IsControlJustReleased(0, Config.Keys.interact)) {
+		if (ropeAttachedVehicle) {
+			emitNet('gs_towrope:DetachRope', NetworkGetNetworkIdFromEntity(vehicle));
+			Functions.PlayAnim(ped, 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', 'machinic_loop_mechandplayer', { infinite: true, blend: 2.0, flag: 1 });
+			await Delay(2500)
+			ClearPedTasks(ped)
+		} else {
+			await HandleRope(vehicle, offsetCoords);
+		}
+	}
+
+	if (ms &gt; 0) await Delay(ms);
+});
+
+const HandleRope = async (originVehicle, originCoords) =&gt; {
+	const ped = PlayerPedId();
+
+	// Handle the case of an existing rope
+	if (roping) {
+		ClearPedTasks(ped);
+		DeleteRope(carriedRope);
+		DeleteEntity(hookProp);
+		roping = false;
+		return;
+	}
+
+	// Play animation to pickup the the rope.
+	Functions.PlayAnim(ped, 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', 'machinic_loop_mechandplayer', { infinite: true, blend: 2.0, flag: 1 });
+	await Delay(2500)
+	ClearPedTasks(ped)
+
+	// Spawn the hook and play the animation, give some time  for the prop to get to the right position in the animation
+	Functions.PlayAnim(ped, 'move_p_m_zero_rucksack', 'idle', { infinite: true, blend: 2.0, flag: 35 });
+	hookProp = await AddPropToPlayer('prop_rope_hook_01', 6286, 0.05, 0.02, -0.02, 84.0, -191.0, 29.0);
+	await Delay(750);
+
+	// Create the rope and attach the entities
+	carriedRope = await CreateRope(...originCoords, 0.0, 0.0, 0.0, 0.5, 0.5, 0.1);
+	const boneCoords = GetWorldPositionOfEntityBone(ped, GetPedBoneIndex(ped, 40269));
+	AttachEntitiesToRope(carriedRope, ped, originVehicle, ...boneCoords, ...originCoords, Config.MaxRopeLength, 0, 0);
+	roping = true;
+
+	const carryLoop = setTick(async () =&gt; {
+		// Disable entering vehicles
+		DisableControlAction(0, 23, true);
+
+		// If canceled, delete the current rope attached to the player and reset the state and stop this tick.
+		if (IsControlPressed(0, Config.Keys.cancel) || IsPedInAnyVehicle(ped, true) || IsPedRagdoll(ped) || !roping) {
+			ClearPedTasks(ped);
+			RemoveRope(carriedRope);
+			DeleteEntity(hookProp);
+			clearTick(carryLoop);
+			roping = false;
+		}
+
+		// Find the closest vehicle and display text to attach rope
+		const pedCoords = GetEntityCoords(ped);
+		let closestVehicle = Functions.GetClosestVehicle({
+			coords: pedCoords,
+			range: 10,
+		});
+
+		// Only continue if a vehicle is found
+		if (closestVehicle != 0 &amp;&amp; closestVehicle != originVehicle) {
+			let text = Config.Locales['attachCable'];
+
+			// Get the vehicle model dimensions and text positions
+			const [maximum, minimum] = GetModelDimensions(GetEntityModel(closestVehicle));
+			const yOffset = (maximum[1] - minimum[1]) / 2;
+			const vehicleOffsetBack = GetOffsetFromEntityInWorldCoords(closestVehicle, 0.0, yOffset, 0.0);
+			const vehicleOffsetFront = GetOffsetFromEntityInWorldCoords(closestVehicle, 0.0, -yOffset, 0.0);
+
+			// Check if front or back is closest to the ped
+			let vehicleOffset = vehicleOffsetBack;
+			let yOffsetSign = 1;
+			if (Functions.CalcDist(pedCoords, vehicleOffsetBack) &gt; Functions.CalcDist(pedCoords, vehicleOffsetFront)) {
+				vehicleOffset = vehicleOffsetFront;
+				yOffsetSign = -1;
+			}
+
+			// Display the correct text
+			const dist = Functions.CalcDist(pedCoords, vehicleOffset);
+			text = dist &lt; 2.0 ? Config.Locales['keyIndicator'] + text : text;
+			DrawText3D(vehicleOffset, text);
+
+			// If the ped is close enough, allow attachment of the rope
+			if (dist &lt; 2.0) {
+				if (IsControlPressed(0, Config.Keys.interact)) {
+					// Check if the found vehicle is not attached to anything.
+					if (IsEntityAttached(closestVehicle)) {
+						Functions.ShowNotification({ message: Config.Locales['vehicleIsAttached'] });
+						return;
+					}
+
+					// Animation attaching the rope.
+					const vehicleHeading = GetEntityHeading(closestVehicle);
+					const pedHeading = yOffsetSign == -1 ? vehicleHeading - 180.0 : vehicleHeading;
+					SetEntityHeading(ped, pedHeading);
+					Functions.PlayAnim(ped, 'anim@amb@clubhouse@tutorial@bkr_tut_ig3@', 'machinic_loop_mechandplayer', { infinite: true, blend: 2.0, flag: 51 });
+					await Delay(2500)
+					ClearPedTasks(ped)
+
+					// If vehicle is still close, attach the rope
+					if (Functions.CalcDist(pedCoords, GetOffsetFromEntityInWorldCoords(closestVehicle, 0.0, yOffsetSign * yOffset, 0.0)) &lt; 3.0) {
+						// Update the server with the rope start coords and the to be attached vehicle
+						emitNet(
+							'gs_towrope:AttachRope',
+							NetworkGetNetworkIdFromEntity(originVehicle),
+							NetworkGetNetworkIdFromEntity(closestVehicle),
+							yOffsetSign
+						);
+					}
+
+					ClearPedTasks(ped);
+					RemoveRope(carriedRope);
+					DeleteEntity(hookProp);
+					clearTick(carryLoop);
+					roping = false;
+				}
+			}
+		}
+	});
+};
+
+const CreateRope = async (x1, y1, z1, x2, y2, z2, maxLength, initLength, minLength) =&gt; {
+	RopeLoadTextures();
+	while (!RopeAreTexturesLoaded()) {
+		await Delay(10);
+	}
+	retval = AddRope(x1, y1, z1, x2, y2, z2, maxLength, 4, initLength, minLength, 1.0, false, false, true, 5.0, false, 0);
+	retval = retval[0];
+	return retval;
+};
+
+const RemoveRope = async (rope) =&gt; {
+	if (DoesRopeExist(rope)) {
+		DeleteRope(rope);
+		RopeUnloadTextures();
+	}
+};
+
+const AddPropToPlayer = async (propName, bone, off1, off2, off3, rot1, rot2, rot3) =&gt; {
+	const Player = PlayerPedId();
+	const [x, y, z] = GetEntityCoords(Player);
+
+	await Functions.LoadModel(propName);
+
+	animProp = CreateObject(GetHashKey(propName), x, y, z + 0.2, true, true, true);
+	while (!DoesEntityExist(animProp)) {
+		await Delay(50);
+	}
+
+	SetEntityCollision(animProp, false, false);
+	if (typeof bone == 'string') {
+		bone = GetEntityBoneIndexByName(Player, bone);
+	} else {
+		bone = GetPedBoneIndex(Player, bone);
+	}
+	AttachEntityToEntity(animProp, Player, bone, off1, off2, off3, rot1, rot2, rot3, true, true, false, true, 1, true);
+	SetModelAsNoLongerNeeded(propName);
+
+	return animProp;
+};
+
+const GetAttachedVehicleRopePosition = (attachedVehicle, yOffsetSign) =&gt; {
+	const [maximum, minimum] = GetModelDimensions(GetEntityModel(attachedVehicle));
+	const yOffset = (maximum[1] - minimum[1]) / 2;
+	const attachedVehicleRopePosition = GetOffsetFromEntityInWorldCoords(attachedVehicle, 0.0, yOffsetSign * yOffset + 0.5 * yOffsetSign, 0.0);
+	return attachedVehicleRopePosition;
+};
+
+const ropeList = {};
+AddStateBagChangeHandler('RopeAttachedVehicle', null, async (bagName, key, RopeAttachedVehicleInfo, reserved, replicated) =&gt; {
+	// Only continue if a vehicle is attached with a rope
+	if (RopeAttachedVehicleInfo == null) return;
+
+	// Ensure the main vehicle is loaded
+	let startTime = GetGameTimer();
+	let vehicle = 0;
+	while (vehicle == 0 &amp;&amp; GetGameTimer() - startTime &lt; 1000) {
+		vehicle = GetEntityFromStateBagName(bagName);
+		await Delay(0);
+	}
+	if (vehicle == 0) return;
+
+	// Check the vehicle class for the rope attach position
+	const vehicleModel = GetEntityModel(vehicle);
+	if (Config.TowVehicles[vehicleModel] == null) return;
+
+	// Define the pickup coords
+	let TowVehicleCoords = Config.TowVehicles[vehicleModel];
+	if (TowVehicleCoords == Config.TowVehicles[Config.FlatbedModel] &amp;&amp; Entity(vehicle).state.bedLowered) TowVehicleCoords = Config.FlatbedLowerd;
+	const vehicleRopePosition = GetOffsetFromEntityInWorldCoords(vehicle, ...TowVehicleCoords);
+
+	// Ensure the attachedVehicle is loaded
+	const attachedVehicleNetId = RopeAttachedVehicleInfo[0];
+	startTime = GetGameTimer();
+	while (!NetworkDoesNetworkIdExist(attachedVehicleNetId) &amp;&amp; GetGameTimer() - startTime &lt; 1000) {
+		await Delay(0);
+	}
+	if (!NetworkDoesNetworkIdExist(attachedVehicleNetId)) return;
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) {
+		return;
+	}
+
+	// Get the sign of the y-offset and the attached vehicle rope position
+	const yOffsetSign = RopeAttachedVehicleInfo[1];
+	const attachedVehicleRopePosition = GetAttachedVehicleRopePosition(attachedVehicle, yOffsetSign);
+
+	// Ensure the distance between the vehicles is not to large
+	const vehicleDist = Functions.CalcDist(vehicleRopePosition, attachedVehicleRopePosition);
+	if (vehicleDist &gt; Config.MaxRopeLength + 2.5) return; // +2.5 to take into account the [Press E] distance and some extra (desync) margin
+
+	// Create the rope
+	const rope = await CreateRope(...vehicleRopePosition, 0.0, 0.0, 0.0, 0.5, vehicleDist, 0.1); // Max dist at 0.5 to fix the rope texture going through the endpoint ()
+	AttachEntitiesToRope(rope, vehicle, attachedVehicle, ...vehicleRopePosition, ...attachedVehicleRopePosition, vehicleDist + 0.5, 0, 0); // Some extra margin with +0.5
+	ropeList[vehicle] = rope;
+
+	// Create a loop to check if the rope needs to be deleted
+	let winding = false;
+	const ropeLoop = setTick(async () =&gt; {
+		let ms = 1000;
+		if (!DoesEntityExist(vehicle) || !DoesEntityExist(attachedVehicle) || Entity(vehicle).state.RopeAttachedVehicle == null) {
+			DeleteRope(rope);
+			delete ropeList[vehicle];
+			clearTick(ropeLoop);
+			return;
+		}
+
+		const vehicleSpeed = GetEntitySpeed(vehicle);
+		const attachedVehicleSpeed = GetEntitySpeed(attachedVehicle);
+		if (vehicleSpeed &gt; 10 || attachedVehicleSpeed &gt; 10) {
+			emitNet('gs_towrope:DetachRope', NetworkGetNetworkIdFromEntity(vehicle));
+			await Delay(500);
+			return;
+		}
+
+		// In case the distance is short and the vehicle is frozen, it should be unfrozen (seperate from if-statement below due to the flag != 131)
+		const dist = RopeGetDistanceBetweenEnds(rope);
+		const playerId = PlayerId();
+		if (dist &lt; Config.MinimumRopeLength &amp;&amp; IsEntityPositionFrozen(vehicle)) {
+			const vehicleEntityOwner = NetworkGetEntityOwner(vehicle);
+			if (playerId == vehicleEntityOwner) {
+				Functions.ShowNotification({ message: Config.Locales['ropeTurnedOff'] });
+				FreezeEntityPosition(vehicle, false);
+			}
+		}
+
+		// In case the rope distance is short or the vehicle is moving, dont allow any interaction and stop the rope from moving
+		const ropeFlags = GetRopeFlags(rope);
+		const attachedVehicleEntityOwner = NetworkGetEntityOwner(attachedVehicle);
+		if ((dist &lt; Config.MinimumRopeLength &amp;&amp; ropeFlags != 131) || (GetEntitySpeed(vehicle) &gt; 0.5 &amp;&amp; ropeFlags != 131)) {
+			// Flag 131 is standard, 163 is winding
+			if (playerId == attachedVehicleEntityOwner) {
+				StopRopeWinding(rope);
+				emitNet(
+					'gs_towrope:RopeResetLength',
+					NetworkGetNetworkIdFromEntity(vehicle),
+					NetworkGetNetworkIdFromEntity(attachedVehicle),
+					yOffsetSign
+				);
+			} else {
+				emitNet(
+					'gs_towrope:StopWindRope',
+					NetworkGetNetworkIdFromEntity(vehicle),
+					NetworkGetNetworkIdFromEntity(attachedVehicle),
+					yOffsetSign
+				);
+			}
+			await Delay(ms);
+			return;
+		}
+
+		// Check if the ped is the driver of the main vehicle to allow interaction
+		const ped = PlayerPedId();
+		const driver = GetPedInVehicleSeat(vehicle, -1);
+		if (ped == driver &amp;&amp; dist &gt;= Config.MinimumRopeLength) {
+			ms = 0;
+			if (IsControlJustReleased(0, Config.Keys.wind)) {
+				if (!winding) {
+					// Stop winding
+					winding = true;
+					FreezeEntityPosition(vehicle, true);
+					Functions.ShowNotification({ message: Config.Locales['ropeTurnedOn'] });
+					if (playerId == attachedVehicleEntityOwner) {
+						StartRopeWinding(rope);
+					} else {
+						emitNet('gs_towrope:StartWindRope', NetworkGetNetworkIdFromEntity(vehicle), NetworkGetNetworkIdFromEntity(attachedVehicle));
+					}
+				} else {
+					// Start winding
+					if (playerId == attachedVehicleEntityOwner) {
+						StopRopeWinding(rope);
+						emitNet(
+							'gs_towrope:RopeResetLength',
+							NetworkGetNetworkIdFromEntity(vehicle),
+							NetworkGetNetworkIdFromEntity(attachedVehicle),
+							yOffsetSign
+						);
+					} else {
+						emitNet(
+							'gs_towrope:StopWindRope',
+							NetworkGetNetworkIdFromEntity(vehicle),
+							NetworkGetNetworkIdFromEntity(attachedVehicle),
+							yOffsetSign
+						);
+					}
+					winding = false;
+					FreezeEntityPosition(vehicle, false);
+					Functions.ShowNotification({ message: Config.Locales['ropeTurnedOff'] });
+				}
+				await Delay(500);
+			}
+		}
+
+		if (ms &gt; 0) await Delay(ms);
+	});
+});
+
+onNet('gs_towrope:StartWindRopeClient', async (vehicleNetId) =&gt; {
+	// Check if the net id and entity exist
+	if (!NetworkDoesNetworkIdExist(vehicleNetId)) return;
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	// Avoid the start of winding in case the distance is not synced correctly
+	const dist = RopeGetDistanceBetweenEnds(ropeList[vehicle]);
+	if (dist &lt; Config.MinimumRopeLength) return;
+
+	if (ropeList[vehicle] != null) {
+		StartRopeWinding(ropeList[vehicle]);
+	}
+});
+
+onNet('gs_towrope:StopWindRopeClient', async (vehicleNetId) =&gt; {
+	// Check if the net id and entity exist
+	if (!NetworkDoesNetworkIdExist(vehicleNetId)) return;
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	if (ropeList[vehicle] != null) {
+		StopRopeWinding(ropeList[vehicle]);
+	}
+});
+
+onNet('gs_towrope:RopeResetLenghtClient', async (vehicleNetId, attachedVehicleNetId, yOffsetSign) =&gt; {
+	// Check if the net id and entity exist
+	if (!NetworkDoesNetworkIdExist(vehicleNetId)) return;
+	const vehicle = NetworkGetEntityFromNetworkId(vehicleNetId);
+	if (!DoesEntityExist(vehicle)) return;
+
+	// If the player is the entity owner of the flatbed, and the flatbed is frozen, it should be unfrozen
+	// This is done as extra, incase the flatbed is somehow still frozen
+	if (PlayerId() == NetworkGetEntityOwner(vehicle)) { 
+		if (IsEntityPositionFrozen(vehicle)); FreezeEntityPosition(vehicle, false);
+	}
+
+	// Check if the net id and entity exist
+	if (!NetworkDoesNetworkIdExist(attachedVehicleNetId)) return;
+	const attachedVehicle = NetworkGetEntityFromNetworkId(attachedVehicleNetId);
+	if (!DoesEntityExist(attachedVehicle)) return;
+
+	// Only continue if the rope already exists
+	if (ropeList[vehicle] != null) {
+		const dist = RopeGetDistanceBetweenEnds(ropeList[vehicle]);
+		if (dist &gt; Config.MaxRopeLength + 2.5) return;
+		// Check the vehicle class for the rope attach position
+		const vehicleModel = GetEntityModel(vehicle);
+		if (Config.TowVehicles[vehicleModel] == null) return;
+		let TowVehicleCoords = Config.TowVehicles[vehicleModel];
+		if (TowVehicleCoords == Config.TowVehicles[Config.FlatbedModel] &amp;&amp; Entity(vehicle).state.bedLowered)
+			TowVehicleCoords = Config.FlatbedLowerd;
+		const vehicleRopePosition = GetOffsetFromEntityInWorldCoords(vehicle, ...TowVehicleCoords);
+
+		// Get the rope position for the attachedVehicle
+		const attachedVehicleRopePosition = GetAttachedVehicleRopePosition(attachedVehicle, yOffsetSign);
+		AttachEntitiesToRope(ropeList[vehicle], vehicle, attachedVehicle, ...vehicleRopePosition, ...attachedVehicleRopePosition, dist, 0, 0);
+	}
+});
+</file>
+<file name="client/cl_playerjob.js">// When editing this file, also check the code in sv_main.js, there are additional job checks present for security reasons.
+
+let ESX = null;
+let QBCore = null;
+
+if (GetResourceState('es_extended') == 'started') {
+    ESX = exports['es_extended'].getSharedObject();
+} else if (GetResourceState('qb-core') == 'started') {
+    QBCore = exports['qb-core'].GetCoreObject();
+}
+
+// This function should return the player's job, adjust to your framework if required
+const GetPlayerJob = () =&gt; {
+    if (ESX) {
+        const playerData = ESX.GetPlayerData();
+        if (playerData &amp;&amp; playerData.job &amp;&amp; playerData.job.name) {
+            return playerData.job.name;
+        }
+    } else if (QBCore) {
+        const playerData = QBCore.Functions.GetPlayerData();
+        if (playerData &amp;&amp; playerData.job &amp;&amp; playerData.job.name) {
+            return playerData.job.name;
+        }
+    }
+
+    return 'unemployed';
+}</file>
+</source>
