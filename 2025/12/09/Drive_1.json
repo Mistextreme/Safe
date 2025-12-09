@@ -1,0 +1,14 @@
+{
+  "applets": [{
+    "lastAccessTime": "2025-08-25T13:38:18.879723Z",
+    "firstAccessTime": "2025-08-25T13:38:18.879723Z",
+    "source": {
+      "drive": {
+        "resourceId": "1Y3BboOy0A0pMMxtf3Xuby6KmAF5ugaYO",
+        "revisionId": "0B1Lnjx_srF7NSGoydUUxeUlGWFdyVGdPaDhFdm05NCtjQjZNPQ"
+      }
+    },
+    "name": "FiveM Lua Refactor Pro",
+    "description": "An intelligent tool to analyze, refactor, and beautify your FiveM Lua scripts. Upload your entire resource, and our AI will improve code quality, readability, and consistency while preserving 100% of the original functionality."
+  }]
+}
