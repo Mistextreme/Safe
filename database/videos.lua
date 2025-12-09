@@ -19,5 +19,41 @@ return {
     ["grok_video_2025-12-03-10-50-44"] = {
         label = "grok_video_2025-12-03-10-50-44",
         video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/grok_video_2025-12-03-10-50-44.mp4?token=AO2YHHBB76PQEOM7PGSWIUDJG6XXM"
+    },
+    ["Drive_7"] = {
+        label = "Drive_7",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_7.mp4?token=AO2YHHDQIDSCMHQQBJDHMFLJG6ZKE"
+    },
+    ["Drive_8"] = {
+        label = "Drive_8",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_8.mp4?token=AO2YHHEZJR7MV5TD22NZQQDJG6ZKK"
+    },
+    ["Drive_9"] = {
+        label = "Drive_9",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_9.mp4?token=AO2YHHBOAQ4JYQZWVA5S6NLJG6ZKU"
+    },
+    ["Drive_10"] = {
+        label = "Drive_10",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_10.mp4?token=AO2YHHHVJCOWGPTMLM6WLQ3JG6ZK4"
+    },
+    ["Drive_11"] = {
+        label = "Drive_11",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_11.mp4?token=AO2YHHCBZUTIJ3QKYSKY7NDJG6ZLI"
+    },
+    ["Drive_12"] = {
+        label = "Drive_12",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_12.mp4?token=AO2YHHEPMFWGMRDVJEMMUQTJG6ZLQ"
+    },
+    ["Drive_13"] = {
+        label = "Drive_13",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_13.mp4?token=AO2YHHGMNMZI2LRPT66TGXDJG6ZL4"
+    },
+    ["Drive_18"] = {
+        label = "Drive_18",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_18.mp4?token=AO2YHHDNUX7DRF3TRJJI3I3JG6ZNI"
+    },
+    ["Drive_19"] = {
+        label = "Drive_19",
+        video = "https://raw.githubusercontent.com/Mistextreme/Safe/main/2025/12/09/Drive_19.mp4?token=AO2YHHHCOX7BS74KKKB43ITJG6ZNW"
     }
 }
