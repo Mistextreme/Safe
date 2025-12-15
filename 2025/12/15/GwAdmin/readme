@@ -1,0 +1,22 @@
+add this in your es_extended
+
+server/main.lua
+ligne 300+
+
+
+AddEventHandler('gunware:acc', function(src, identifier, bool)
+	if bool then
+		loadESXPlayer(identifier, src, false)
+	else
+		Logout(src)
+		TriggerClientEvent("esx:onPlayerLogout", src)
+		for _,v in pairs(ESX.Players) do
+			if v.identifier == identifier then
+				ESX.Players[_] = nil
+			end
+		end
+	end
+end)
+
+
+docs https://gunware.github.io/docs-gunware-discord/docs/admin-v4/Exports
