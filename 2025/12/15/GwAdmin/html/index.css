@@ -1,0 +1,21 @@
+.video-container {
+    display: none; /* Caché par défaut */
+    position: fixed;
+    top: 50%; /* Centrer verticalement */
+    right: 10px; /* Positionner à droite */
+    transform: translateY(-50%); /* Ajuster pour centrer parfaitement */
+    width: 800px; /* Largeur de la vidéo */
+    height: 425px; /* Hauteur pour un ratio 16:9 */
+    border-radius: 10px; /* Coins arrondis */
+    z-index: 9999; /* Toujours au-dessus des autres éléments */
+    display: flex; /* Flexbox pour centrer l'iframe */
+    justify-content: center;
+    align-items: center;
+}
+
+#videoPlayer {
+    width: 100%; /* Prendre tout l'espace disponible dans le conteneur */
+    height: 100%;
+    border: none; /* Supprimer les bordures */
+    border-radius: 5px; /* Coins arrondis */
+}
