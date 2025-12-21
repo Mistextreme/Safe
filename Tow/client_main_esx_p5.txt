@@ -1,0 +1,207 @@
+local steer_angle = 0.0
+function PushClosestVehicle()
+	local cfg = Config.PushVehicle
+	local coordA = GetEntityCoords(player, 1)
+	local coordB = GetOffsetFromEntityInWorldCoords(player, 0.0, cfg.dist, 0.0)
+	local targetVeh = GetVehicleInDirection(coordA, coordB)
+	local pushed = false 
+	if (DoesEntityExist(targetVeh) and IsEntityAVehicle(targetVeh)) then
+		Menu.CloseAll()
+		T1GER_GetControlOfEntity(targetVeh)
+		SetEntityAsMissionEntity(targetVeh, true, true)
+		local front = nil
+		local new_dist = 0
+		while not pushed do 
+			Wait(1)
+			local d1, d2 = GetModelDimensions(GetEntityModel(targetVeh))
+			local rear_pos = GetOffsetFromEntityInWorldCoords(targetVeh, 0.0, d1.y - 0.25, 0.0)
+			local front_pos = GetOffsetFromEntityInWorldCoords(targetVeh, 0.0, d2.y + 0.25, 0.0)
+			local veh_pos = GetEntityCoords(targetVeh)
+			local distance = #(coords - vector3(veh_pos.x, veh_pos.y, veh_pos.z))
+			local dist_rear = #(coords - vector3(rear_pos.x, rear_pos.y, rear_pos.z))
+			local dist_front = #(coords - vector3(front_pos.x, front_pos.y, front_pos.z))
+			if distance < 5.0 then
+				if dist_rear < cfg.drawText.dist then
+					T1GER_DrawTxt(rear_pos.x, rear_pos.y, rear_pos.z + 0.4, cfg.drawText.str1)
+					T1GER_DrawTxt(rear_pos.x, rear_pos.y, rear_pos.z + 0.30, cfg.drawText.str2)
+					front = false
+					new_dist = dist_rear
+				elseif dist_front < cfg.drawText.dist then
+					T1GER_DrawTxt(front_pos.x, front_pos.y, front_pos.z + 0.4, cfg.drawText.str1)
+					T1GER_DrawTxt(front_pos.x, front_pos.y, front_pos.z + 0.30, cfg.drawText.str2)
+					front = true
+					new_dist = dist_front
+				end
+				if IsControlJustPressed(0, cfg.stopKey) then 
+					steer_angle = 0.0 
+					pushed = true
+				end
+				if IsControlPressed(0, cfg.pushKey) then
+					if new_dist <= cfg.drawText.interactDist then
+						T1GER_LoadAnim(cfg.anim.dict)
+						if front then    
+							AttachEntityToEntity(player, targetVeh, GetPedBoneIndex(6286), 0.0, (d2.y + 0.25), (d1.z + 1.0), 0.0, 0.0, 180.0, false, false, false, true, false, true)
+						else
+							AttachEntityToEntity(player, targetVeh, GetPedBoneIndex(6286), 0.0, (d1.y - 0.25), (d1.z + 1.0), 0.0, 0.0, 0.0, false, false, false, true, false, true)
+						end
+						TaskPlayAnim(player, cfg.anim.dict, cfg.anim.lib, 3.0, 3.0, -1, 35, 1.0, 0, 0, 0)
+						Wait(300)
+						while true do
+							Wait(1)
+							DisplayHelpText(('Steer vehicle with ~INPUT_MOVE_LEFT_ONLY~ and ~INPUT_MOVE_RIGHT_ONLY~'))
+							
+							if front then SetVehicleForwardSpeed(targetVeh, -0.80) else SetVehicleForwardSpeed(targetVeh, 0.80) end
+							if HasEntityCollidedWithAnything(targetVeh) then SetVehicleOnGroundProperly(targetVeh) end
+
+							local veh_speed = GetFrameTime() * 75
+							if IsDisabledControlPressed(0, cfg.leftKey) then
+								SetVehicleSteeringAngle(targetVeh, steer_angle)
+								steer_angle = steer_angle + veh_speed
+							elseif IsDisabledControlPressed(0, cfg.rightKey) then
+								SetVehicleSteeringAngle(targetVeh, steer_angle)
+								steer_angle = steer_angle - veh_speed
+							else
+								SetVehicleSteeringAngle(targetVeh, steer_angle)
+								if steer_angle < -0.7 then steer_angle = steer_angle + veh_speed
+								elseif steer_angle > 0.7 then steer_angle = steer_angle - veh_speed
+								else steer_angle = 0.0 end
+							end
+
+							if steer_angle > 25.0 then steer_angle = 25.0 elseif steer_angle < -25.0 then steer_angle = -25.0 end
+		
+							if not IsDisabledControlPressed(0, cfg.pushKey) then
+								StopAnimTask(player, 'missfinale_c2ig_11', 'pushcar_offcliff_m', 2.0)
+								DetachEntity(player, false, false)
+								break
+							end
+						end
+					else
+						TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+					end
+				end
+			end
+		end
+	else
+		TriggerEvent('t1ger_towtrucker:notify', Lang['no_vehicle_nearby'])
+	end
+end
+
+local towing = {inUse = false, truck = nil, target = nil}
+
+RegisterCommand(Config.FlatbedTowing.command, function(source, args)
+	if towing.inUse == false then 
+		FlatbedTowFunction()
+	else
+		towing.inUse = false
+	end
+end, false)
+
+function FlatbedTowFunction()
+	Menu.CloseAll()
+	local cfg = Config.FlatbedTowing
+	local towtruck = GetVehiclePedIsIn(player, false)
+	if towtruck == 0 or towtruck == nil then
+		towtruck = T1GER_GetClosestVehicle(coords, 3.0)
+	end
+	local complete = false
+	if (DoesEntityExist(towtruck) and IsEntityAVehicle(towtruck)) then
+		if GetEntityModel(towtruck) == GetEntityModel(towing.target) then 
+			if GetLastDrivenVehicle() == towtruck then
+				return TriggerEvent('t1ger_towtrucker:notify', Lang['veh_not_towtruck'])
+			else
+				towtruck = GetLastDrivenVehicle()
+			end
+		end
+		if IsVehicleTowTruck(towtruck) then 
+			T1GER_GetControlOfEntity(towtruck)
+			SetEntityAsMissionEntity(towtruck, true, true)
+			towing.truck = towtruck
+			towing.inUse = true
+			while not complete do
+				Wait(1)
+				local sleep = true
+
+				local d1, d2 = GetModelDimensions(GetEntityModel(towtruck))
+				local truck_pos = GetOffsetFromEntityInWorldCoords(towtruck, (d1.x-0.05), (d1.y + 1.0), 0.0)
+				local attach_point = GetOffsetFromEntityInWorldCoords(towtruck, 0.0, (d1.y - 3.0), 0.0)
+				local distance = #(coords - vector3(truck_pos.x, truck_pos.y, truck_pos.z))
+
+				if distance <= cfg.drawText.dist then
+					sleep = false
+
+					if towing.target == nil then
+						local attachDist = #(coords - vector3(attach_point.x, attach_point.y, attach_point.z))
+						if attachDist < cfg.marker.drawDist then 
+							local mk = cfg.marker
+							DrawMarker(mk.type, attach_point.x, attach_point.y, attach_point.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2, false, false, false, false)
+						end
+						if distance <= cfg.drawText.dist then 
+							T1GER_DrawTxt(truck_pos.x, truck_pos.y, truck_pos.z + 0.4, cfg.drawText.attach)
+						end
+						if IsControlJustPressed(0, cfg.attachKey) then 
+							if distance <= cfg.interactDist then
+								local targetVehicle = T1GER_GetClosestVehicle(attach_point, 2.0)
+								if (DoesEntityExist(targetVehicle) and IsEntityAVehicle(targetVehicle)) then
+									if VehicleIsBlacklisted(targetVehicle) then 
+										return TriggerEvent('t1ger_towtrucker:notify', Lang['pickup_blacklisted'])
+									else
+										T1GER_GetControlOfEntity(targetVehicle)
+										SetEntityAsMissionEntity(targetVehicle, true, true)
+										local cfgTruck = k
+										for k, v in pairs(Config.FlatbedTowing.trucks) do 
+											if IsVehicleModel(towtruck, k) then
+												cfgTruck = k
+												break
+											end
+										end
+										local sk = Config.FlatbedTowing.trucks[cfgTruck]
+										AttachEntityToEntity(targetVehicle, towtruck, GetEntityBoneIndexByName(towtruck, sk.boneIndex_name), sk.offset[1], sk.offset[2], sk.offset[3], 0, 0, 0, 1, 1, 0, 1, 0, 1)
+										towing.target = targetVehicle
+										towing.inUse = false
+										complete = true
+									end
+								else
+									TriggerEvent('t1ger_towtrucker:notify', Lang['park_pickup_marker'])
+								end
+							else
+								TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+							end
+						end
+					else
+						if distance <= cfg.drawText.dist then 
+							T1GER_DrawTxt(truck_pos.x, truck_pos.y, truck_pos.z + 0.4, cfg.drawText.detach)
+						end
+						if IsControlJustPressed(0, cfg.detachKey) then
+							if distance <= cfg.interactDist then
+								DetachEntity(towing.target)
+								SetEntityCoords(towing.target, attach_point.x, attach_point.y, attach_point.z, 1, 0, 0, 1)
+								SetVehicleOnGroundProperly(towing.target)
+								towing.target = nil
+								towing.inUse = false
+								complete = true
+							else
+								TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+							end 
+						end
+					end
+				end
+
+				if distance > 20.0 then 
+					TriggerEvent('t1ger_towtrucker:notify', Lang['towtruck_too_far'])
+					complete = true
+				end
+
+				if towing.inUse == false then
+					complete = true
+				end
+
+				if sleep then 
+					Wait(500)
+				end
+			end
+			towing.inUse = false
+		else
+			TriggerEvent('t1ger_towtrucker:notify', Lang['towtruck_not_found'])
+		end
+	end
+end
