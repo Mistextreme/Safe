@@ -1,0 +1,212 @@
+-------------------------------------
+------- Created by T1GER#9080 -------
+------- Converted to ESX Legacy ----
+------------------------------------- 
+
+local Menu = {}
+local activeMenu
+local function toVector3(position)
+	if type(position) == 'vector3' or type(position) == 'vector4' then
+		return position
+	end
+	if type(position) == 'table' then
+		return vec3(position.x or position[1], position.y or position[2], position.z or position[3])
+	end
+	return position
+end
+
+local Game = {}
+
+function Game.SpawnVehicle(model, coords, heading, cb)
+	ESX.Game.SpawnVehicle(model, toVector3(coords), heading, function(vehicle)
+		if cb then cb(vehicle) end
+	end)
+end
+
+function Game.SpawnObject(model, coords, cb)
+	local modelHash = type(model) == 'number' and model or joaat(model)
+	CreateThread(function()
+		RequestModel(modelHash)
+		while not HasModelLoaded(modelHash) do Wait(50) end
+		local obj = CreateObject(modelHash, coords.x, coords.y, coords.z, true, true, false)
+		if cb then cb(obj) end
+	end)
+end
+
+function Game.GetVehicleProperties(vehicle)
+	return ESX.Game.GetVehicleProperties(vehicle)
+end
+
+function Game.SetVehicleProperties(vehicle, props)
+	ESX.Game.SetVehicleProperties(vehicle, props)
+end
+
+function Game.DeleteVehicle(vehicle)
+	ESX.Game.DeleteVehicle(vehicle)
+end
+
+function Game.GetClosestPlayer()
+	return ESX.Game.GetClosestPlayer()
+end
+
+function Menu.CloseAll()
+	activeMenu = nil
+	lib.hideContext()
+end
+
+function Menu.Open(menuType, resource, name, data, onSelect, onCancel)
+	if menuType == 'dialog' then
+		local dialogTitle = data.title or 'Input'
+		local inputs = data.inputs or {
+			{ type = 'input', label = dialogTitle, required = data.required ~= false }
+		}
+		local response = lib.inputDialog(dialogTitle, inputs)
+		local dialogMenu = { close = function() end }
+		if response then
+			if onSelect then onSelect({ value = response[1] }, dialogMenu) end
+		elseif onCancel then
+			onCancel({}, dialogMenu)
+		end
+		return
+	end
+
+	local options = {}
+	for _, element in ipairs(data.elements or {}) do
+		local option = {
+			title = element.label or element.title or 'Item',
+			description = element.desc or element.description,
+			icon = element.icon,
+			iconColor = element.iconColor,
+			disabled = element.disabled or false,
+			metadata = element.metadata
+		}
+		option.onSelect = function()
+			local contextMenu = {
+				close = function()
+					lib.hideContext()
+					if activeMenu == name then activeMenu = nil end
+				end
+			}
+			if onSelect then onSelect({ current = element }, contextMenu) end
+		end
+		table.insert(options, option)
+	end
+
+	lib.registerContext({
+		id = name,
+		title = data.title or 'Menu',
+		options = options,
+		onExit = function()
+			if activeMenu == name then activeMenu = nil end
+			if onCancel then onCancel({}, { close = function() end }) end
+		end
+	})
+	activeMenu = name
+	lib.showContext(name)
+end
+
+local cache = {
+	ped = PlayerPedId(),
+	coords = GetEntityCoords(PlayerPedId()),
+	vehicle = 0
+}
+
+local player, coords = cache.ped, cache.coords
+
+lib.onCache('ped', function(value)
+	cache.ped = value or PlayerPedId()
+	player = cache.ped
+end)
+
+lib.onCache('coords', function(value)
+	cache.coords = value or GetEntityCoords(cache.ped)
+	coords = cache.coords
+end)
+
+lib.onCache('vehicle', function(value)
+	cache.vehicle = value or 0
+end)
+
+local function PlayerPed()
+	return cache.ped or PlayerPedId()
+end
+
+local function PlayerCoords()
+	return cache.coords or GetEntityCoords(PlayerPed())
+end
+
+local function PlayerVehicle()
+	local vehicle = cache.vehicle
+	if vehicle and vehicle ~= 0 then
+		return vehicle
+	end
+
+	if IsPedInAnyVehicle(PlayerPed(), false) then
+		vehicle = GetVehiclePedIsIn(PlayerPed(), false)
+		cache.vehicle = vehicle
+		return vehicle
+	end
+
+	return nil
+end
+
+local towServices = {}
+local towBlips = {}
+local isOwner = 0
+local towID = 0
+
+RegisterNetEvent('t1ger_towtrucker:loadTowServices')
+AddEventHandler('t1ger_towtrucker:loadTowServices', function(results, cfg, num, id)
+	Config.TowServices = cfg
+	towServices = results
+	isOwner = num
+	TriggerEvent('t1ger_towtrucker:setTowID', id)
+	Wait(200)
+	UpdateTowServiceBlips()
+	RefreshTowServicePoints()
+end)
+
+RegisterNetEvent('t1ger_towtrucker:syncTowServices')
+AddEventHandler('t1ger_towtrucker:syncTowServices', function(results, cfg)
+	Config.TowServices = cfg
+	towServices = results
+	Wait(200)
+	UpdateTowServiceBlips()
+	RefreshTowServicePoints()
+end)
+
+RegisterNetEvent('t1ger_towtrucker:setTowID')
+AddEventHandler('t1ger_towtrucker:setTowID', function(id)
+	towID = id
+end)
+
+function UpdateTowServiceBlips()
+	for k, v in pairs(towBlips) do
+		RemoveBlip(v)
+	end
+	for i = 1, #Config.TowServices do
+		if Config.TowServices[i].owned == true then
+			CreateTowServiceBlip(Config.TowServices[i], towServices[i])
+		else
+			CreateTowServiceBlip(Config.TowServices[i], nil)
+		end
+	end
+end
+
+function CreateTowServiceBlip(cfg, data)
+	local mk = Config.BlipSettings['service']
+	local bName = mk.name
+	if data ~= nil then bName = data.name end
+	if mk.enable then
+		local blip = AddBlipForCoord(cfg.boss_pos.x, cfg.boss_pos.y, cfg.boss_pos.z)
+		SetBlipSprite(blip, mk.sprite)
+		SetBlipDisplay(blip, mk.display)
+		SetBlipScale(blip, mk.scale)
+		SetBlipColour(blip, mk.color)
+		SetBlipAsShortRange(blip, true)
+		BeginTextCommandSetBlipName("STRING")
+		AddTextComponentString(bName)
+		EndTextCommandSetBlipName(blip)
+		table.insert(towBlips, blip)
+	end
+end
