@@ -1,0 +1,369 @@
+local CancelJob = false
+RegisterNetEvent('t1ger_towtrucker:startJobWithNPC')
+AddEventHandler('t1ger_towtrucker:startJobWithNPC', function(type, num)
+	local JobDone = false
+	local job = Config.TowTruckerJobs[type][num]
+	local blip = CreateJobBlip(job.pos)
+	local TowTruck = nil
+	local buttonClicked = false
+
+	while not JobDone do 
+		Wait(0)
+
+		if job.inUse then
+
+			local coords = GetEntityCoords(GetPlayerPed(-1))
+			local jobDistance = GetDistanceBetweenCoords(coords.x, coords.y, coords.z, job.pos[1], job.pos[2], job.pos[3], false)
+
+			if jobDistance < 100.0 and towJob.veh == nil then
+				towJob.veh = CreateJobVehicle(job, type)
+				SetEntityAsMissionEntity(towJob.veh, true, true)
+			end
+
+			if type == 'break_downs' then
+
+				if towJob.alertCall == nil then
+					local message = Lang['job_breakdown_msg']
+					TriggerEvent('t1ger_towtrucker:notifyAdvanced', 'CHAR_TOW_TONYA', 'CHAR_TOW_TONYA', 6, 'TOW EMERGENCY CALL', false, '~r~BREAKDOWN~s~', message)
+					towJob.alertCall = true 
+				end
+
+				if jobDistance < 90.0 and towJob.ped == nil then
+					towJob.ped = CreateJobPed(job)	
+					SetEntityAsMissionEntity(towJob.ped, true, true)
+				end
+
+				if jobDistance < 10.0 then 
+
+					if jobDistance < 6.0 and towJob.pedShouted == nil then
+						TriggerEvent('t1ger_towtrucker:notify', Lang['job_shout_msg'])
+						towJob.pedShouted = true
+					end
+
+					local d1, d2 = GetModelDimensions(GetEntityModel(towJob.veh))
+					local engineCoords = GetOffsetFromEntityInWorldCoords(towJob.veh, 0.0, d2.y+0.2, 0.0)
+					local vehicleDist = #(coords - engineCoords)
+
+					if vehicleDist < 5.0 and towJob.inspected == nil then
+						T1GER_DrawTxt(engineCoords.x, engineCoords.y, engineCoords.z, Lang['draw_inspect_vehicle'])
+						if IsControlJustPressed(0, Config.KeyControls['inspect_vehicle']) and vehicleDist <= 1.0 and not buttonClicked then
+							if IsPedInAnyVehicle(player, true) then
+								return TriggerEvent('t1ger_towtrucker:notify', Lang['action_not_possible'])
+							end
+							buttonClicked = true
+							SetVehicleDoorOpen(towJob.veh, 4, 0, 0)
+							TaskTurnPedToFaceEntity(GetPlayerPed(-1), towJob.veh, 1.0)
+							Wait(1000)
+							local animDict = "mini@repair"
+							T1GER_LoadAnim(animDict)
+							if not IsEntityPlayingAnim(GetPlayerPed(-1), animDict, "fixing_a_player", 3) then
+								TaskPlayAnim(GetPlayerPed(-1), animDict, "fixing_a_player", 5.0, -5, -1, 16, false, false, false, false)
+							end
+							if Config.ProgressBars then 
+								lib.progressBar({
+									duration = 3000,
+									label = Lang['pb_towjob'],
+									useWhileDead = false,
+									canCancel = false,
+									disable = {
+										move = true,
+										car = true,
+										combat = true
+									}
+								})
+							else
+								Wait(3000)
+							end
+							SetVehicleDoorShut(towJob.veh, 4, 1, 1)
+							ClearPedTasks(GetPlayerPed(-1))
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_attach_veh'])
+							towJob.inspected = true
+							buttonClicked = false
+						end
+					end
+
+					local pedCoords = GetEntityCoords(towJob.ped)
+					local pedDist = #(coords - pedCoords)
+
+					if pedDist < 5.0 and towJob.inspected and IsEntityAttachedToAnyVehicle(towJob.veh) and towJob.talked == nil then
+						T1GER_DrawTxt(pedCoords.x, pedCoords.y, pedCoords.z, Lang['draw_ask_npc_follow'])
+						if IsControlJustPressed(0, Config.KeyControls['npc_follow']) and pedDist <= 1.0 and not buttonClicked then
+							buttonClicked = true
+							TowTruck = GetEntityAttachedTo(towJob.veh)
+							if IsVehicleSeatFree(TowTruck, 0) then 
+								ClearPedTasksImmediately(towJob.ped)
+								FreezeEntityPosition(towJob.ped, false)
+								TaskEnterVehicle(towJob.ped, TowTruck, 20000, 0, 1.0, 1, 0)
+							else
+								TriggerEvent('t1ger_towtrucker:notify', Lang['job_seat_occupied'])
+							end
+							SetRelationshipBetweenGroups(0, GetHashKey("PLAYER"), GetHashKey("NPC"))
+							SetRelationshipBetweenGroups(0, GetHashKey("NPC"), GetHashKey("PLAYER"))
+							towJob.talked = true
+							buttonClicked = false
+						end
+					end
+
+				end
+
+				if IsEntityAttachedToAnyVehicle(towJob.veh) and (GetPedInVehicleSeat(TowTruck, 0) == towJob.ped) then
+					if towJob.destination == nil then
+						if DoesBlipExist(blip) then 
+							RemoveBlip(blip)
+						end
+						TriggerEvent('t1ger_towtrucker:notify', Lang['job_dropoff_msg1'])
+						blip = CreateJobBlip(job.dropoff)
+						towJob.destination = true
+					end
+				end
+
+				local dropoffDist = #(coords - vector3(job.dropoff[1], job.dropoff[2], job.dropoff[3]))
+
+				if dropoffDist < 20.0 and towJob.destination ~= nil then
+					if IsEntityAttachedToAnyVehicle(towJob.veh) then 
+						local mk = Config.MarkerSettings['dropoff']
+						DrawMarker(mk.type, job.dropoff[1], job.dropoff[2], job.dropoff[3], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2)
+					end
+					if dropoffDist < 10.0 and towJob.dropMessage == nil then 
+						TriggerEvent('t1ger_towtrucker:notify', Lang['job_park_inside_marker'])
+						towJob.dropMessage = true
+					end
+					local vehicleCoords = GetEntityCoords(towJob.veh)
+					local vehDist = #(vehicleCoords - vector3(job.dropoff[1], job.dropoff[2], job.dropoff[3]))
+					if not IsEntityAttachedToAnyVehicle(towJob.veh) and vehDist < 3.0 and towJob.detached == nil then
+						TaskLeaveVehicle(towJob.ped, TowTruck, 0)
+						Wait(3000)
+						TaskTurnPedToFaceEntity(towJob.ped, towJob.veh, 1.0)
+						Wait(1000)
+						TriggerEvent('t1ger_towtrucker:notify', Lang['job_collect_cash'])
+						towJob.detached = true
+					end
+					local pedCoords = GetEntityCoords(towJob.ped)
+					local pedDist = #(coords - pedCoords)
+					if pedDist < 5.0 and towJob.detached ~= nil and towJob.collected == nil then
+						T1GER_DrawTxt(pedCoords.x, pedCoords.y, pedCoords.z, Lang['draw_collect_cash'])
+						if IsControlJustPressed(0, Config.KeyControls['collect_cash']) then
+							T1GER_LoadAnim("mp_common")
+							TaskPlayAnim(player, "mp_common", "givetake2_a", 8.0, 8.0, 2000, 0, 1, 0, 0, 0)
+							TaskPlayAnim(towJob.ped, "mp_common", "givetake2_a", 8.0, 8.0, 2000, 0, 1, 0, 0, 0)
+							Wait(2000)
+							if DoesBlipExist(blip) then RemoveBlip(blip) end
+							TaskWanderStandard(towJob.ped, 10.0, 10)
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_thanking_msg'])
+							TriggerServerEvent('t1ger_towtrucker:getJobReward', job.payout)
+							towJob.collected = true
+							DeleteEntity(towJob.veh)
+							Wait(10000)
+							CancelJob = true
+						end
+					end
+				end
+
+			end
+
+			if type == 'illegally_parked' then
+
+				if towJob.alertCall == nil then
+					local message = Lang['job_illegal_parked_msg']
+					TriggerEvent('t1ger_towtrucker:notifyAdvanced', 'CHAR_TOW_TONYA', 'CHAR_TOW_TONYA', 6, 'TOW EMERGENCY CALL', false, '~r~ILLEGAL PARKING~s~', message)
+					towJob.alertCall = true 
+				end
+
+				if towJob.veh ~= nil and DoesEntityExist(towJob.veh) then
+					local vehicleCoords = GetEntityCoords(towJob.veh)
+					local vehicleDist = #(coords - vehicleCoords)
+
+					if vehicleDist <= 20.0 then
+						if towJob.notified == nil then
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_attach_veh2'])
+							towJob.notified = true
+						end
+					end
+
+					if IsEntityAttachedToAnyVehicle(towJob.veh) then
+						if towJob.destination == nil then
+							if DoesBlipExist(blip) then 
+								RemoveBlip(blip)
+							end
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_dropoff_msg2'])
+							blip = CreateJobBlip(job.dropoff)
+							towJob.destination = true
+						end
+					end
+					
+					local dropoffDist = #(coords - vector3(job.dropoff[1], job.dropoff[2], job.dropoff[3]))
+
+					if dropoffDist < 20.0 and towJob.destination ~= nil then
+						if IsEntityAttachedToAnyVehicle(towJob.veh) then 
+							local mk = Config.MarkerSettings['dropoff']
+							DrawMarker(mk.type, job.dropoff[1], job.dropoff[2], job.dropoff[3], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2)
+						end
+						if dropoffDist < 10.0 and towJob.dropMessage == nil then 
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_park_inside_marker'])
+							towJob.dropMessage = true
+						end
+						local vehDist = #(vehicleCoords - vector3(job.dropoff[1], job.dropoff[2], job.dropoff[3]))
+						if not IsEntityAttachedToAnyVehicle(towJob.veh) and vehDist < 3.0 and towJob.detached == nil then
+							TriggerEvent('t1ger_towtrucker:notify', Lang['job_attach_note'])
+							towJob.detached = true
+						end
+						if vehicleDist < 5.0 and towJob.detached ~= nil and towJob.collected == nil then
+							T1GER_DrawTxt(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, Lang['draw_attach_note'])
+							if IsControlJustPressed(0, Config.KeyControls['attach_note']) then
+								TaskPlayAnim(player, "mp_common", "givetake2_a", 8.0, 8.0, 2000, 0, 1, 0, 0, 0)
+								Wait(2000)
+								if DoesBlipExist(blip) then RemoveBlip(blip) end
+								TriggerEvent('t1ger_towtrucker:notify', Lang['job_veh_delivered'])
+								TriggerServerEvent('t1ger_towtrucker:getJobReward', job.payout)
+								towJob.collected = true
+								DeleteEntity(towJob.veh)
+								CancelJob = true
+							end
+						end
+					end
+
+				end
+
+			end
+
+			if CancelJob == true then
+				if DoesEntityExist(towJob.veh) then DeleteVehicle(towJob.veh) end
+				if type == 'break_downs' then
+					if DoesEntityExist(towJob.ped) then
+						SetEntityAsNoLongerNeeded(towJob.ped)
+					end
+				end
+				if DoesBlipExist(blip) then RemoveBlip(blip) end
+				Config.TowTruckerJobs[type][num].inUse = false
+				Wait(200)
+				TriggerServerEvent('t1ger_towtrucker:JobDataSV', type, num, Config.TowTruckerJobs[type][num])
+				towJob = {}
+				CancelJob = false
+				break
+			end
+
+		end
+	end
+
+end)
+
+function CreateJobVehicle(data, type)
+	local entity = nil
+	ClearAreaOfVehicles(data.pos[1], data.pos[2], data.pos[3], 10.0, false, false, false, false, false)
+	math.randomseed(GetGameTimer())
+	local num = math.random(#Config.TowTruckerJobs.JobVehicles)
+	local model = Config.TowTruckerJobs.JobVehicles[num]
+	Game.SpawnVehicle(model, {x = data.pos[1], y = data.pos[2], z = data.pos[3]}, data.pos[4], function(vehicle)
+		SetEntityCoordsNoOffset(vehicle, data.pos[1], data.pos[2], data.pos[3])
+		SetEntityHeading(vehicle, data.pos[4])
+		SetVehicleOnGroundProperly(vehicle)
+		if type == 'break_downs' then 
+			SetVehicleEngineHealth(vehicle, 100.0)
+			SetVehicleDoorOpen(vehicle, 4, 0, 0)
+		end
+		entity = vehicle
+	end)
+
+	while not DoesEntityExist(entity) do
+		Wait(10)
+	end
+
+	return entity
+end
+
+function CreateJobPed(data)
+	SetPedRelationshipGroupHash(player, GetHashKey("PLAYER"))
+	AddRelationshipGroup('NPC')
+	T1GER_LoadModel(data.ped)
+	local entity = CreatePed(7, GetHashKey(data.ped), data.npc_pos[1], data.npc_pos[2], data.npc_pos[3]-0.97, data.npc_pos[4], 0, true, true)
+	NetworkRegisterEntityAsNetworked(entity)
+	SetNetworkIdCanMigrate(NetworkGetNetworkIdFromEntity(entity), true)
+	SetNetworkIdExistsOnAllMachines(NetworkGetNetworkIdFromEntity(entity), true)
+	SetPedKeepTask(entity, true)
+	SetPedDropsWeaponsWhenDead(entity, false)
+	SetEntityInvincible(entity, false)
+	SetEntityVisible(entity, true)
+	TaskStartScenarioInPlace(entity, 'WORLD_HUMAN_STAND_IMPATIENT', 0, false)
+	FreezeEntityPosition(entity, true)
+	SetPedRelationshipGroupHash(entity, GetHashKey("NPC"))	
+	SetRelationshipBetweenGroups(0, GetHashKey("PLAYER"), GetHashKey("NPC"))
+	SetRelationshipBetweenGroups(0, GetHashKey("NPC"), GetHashKey("PLAYER"))
+	while not DoesEntityExist(entity) do
+		Wait(10)
+	end
+	return entity
+end
+
+RegisterNetEvent('t1ger_towtrucker:JobDataCL')
+AddEventHandler('t1ger_towtrucker:JobDataCL', function(type, num, data)
+	Config.TowTruckerJobs[type][num] = data
+end)
+
+local using_repairkit = false
+RegisterNetEvent('t1ger_towtrucker:useRepairKit')
+AddEventHandler('t1ger_towtrucker:useRepairKit', function(data)
+	local vehicle = T1GER_GetClosestVehicle(coords, 4.0)
+	if vehicle ~= 0 then
+		if using_repairkit then return end
+		using_repairkit = true
+
+		T1GER_GetControlOfEntity(vehicle)
+
+		local d1, d2 = GetModelDimensions(GetEntityModel(vehicle))
+		local hood = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, d2.y+0.2, 0.0)
+		local distance = (GetDistanceBetweenCoords(GetEntityCoords(player, 1), vector3(hood.x, hood.y, hood.z), true))
+		local vehRepaired = false
+
+		while not vehRepaired do
+			Wait(1)
+			distance = (GetDistanceBetweenCoords(GetEntityCoords(player, 1), vector3(hood.x, hood.y, hood.z), true))
+			T1GER_DrawTxt(hood.x, hood.y, hood.z, Lang['draw_repair_kit'])
+			if IsControlJustPressed(0, Config.KeyControls['use_repairkit']) then 
+				if distance < 1.0 then 
+					SetVehicleDoorOpen(vehicle, 4, 0, 0)
+					TaskTurnPedToFaceEntity(player, vehicle, 1.0)
+					Wait(1000)
+					local animDict = "mini@repair"
+					T1GER_LoadAnim(animDict)
+					if not IsEntityPlayingAnim(player, animDict, "fixing_a_player", 3) then
+						TaskPlayAnim(player, animDict, "fixing_a_player", 5.0, -5, -1, 16, false, false, false, false)
+					end
+					local repairDuration = (((3000-GetVehicleEngineHealth(vehicle)) - (GetVehicleBodyHealth(vehicle)/2))*2 + data.duration)
+					if Config.ProgressBars then
+						lib.progressBar({
+							duration = repairDuration,
+							label = data.progbar,
+							useWhileDead = false,
+							canCancel = false,
+							disable = {
+								move = true,
+								car = true,
+								combat = true
+							}
+						})
+					else
+						Wait(repairDuration)
+					end
+					if GetVehicleEngineHealth(vehicle) < data.setEngine then
+						SetVehicleEngineHealth(vehicle, data.setEngine)
+					end
+					if GetVehicleBodyHealth(vehicle) < 975.0 then
+						SetVehicleBodyHealth(vehicle, 975.0)
+					end
+					for i = 0, 5 do
+						SetVehicleTyreFixed(vehicle, i)
+					end
+					SetVehicleDoorShut(vehicle, 4, 1, 1)
+					ClearPedTasks(player)
+					TriggerEvent('t1ger_towtrucker:notify', Lang['repairkit_used'])
+					vehRepaired = true
+					using_repairkit = false
+					break
+				else
+					distance = #(coords - vector3(hood.x, hood.y, hood.z))
+				end
+			end
+		end
+	end
+	using_repairkit = false
+end)
