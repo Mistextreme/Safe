@@ -1,0 +1,278 @@
+-- ## TOW TRUCKER INTERACTION MENU ## --
+CreateThread(function()
+	while true do
+		Wait(1)
+		if IsControlJustPressed(0, Config.KeyControls['interaction_menu']) then
+			if Config.TowServices[towID] ~= nil then
+				if T1GER_isJob(Config.Society[Config.TowServices[towID].society].name) then
+					OpenTowTruckerActionMenu()
+				end
+			end
+		end
+	end
+end)
+
+RegisterCommand(Config.InteractionMenuCmd, function(source, args)
+	if T1GER_isJob(Config.Society[Config.TowServices[towID].society].name) then
+		OpenTowTruckerActionMenu()
+	end
+end, false)
+
+local holdingObj, carryModel = false, 0
+
+function OpenTowTruckerActionMenu()
+	Menu.CloseAll()
+	local elements = {
+		{ label = 'Billing', value = 'billing' },
+		{ label = 'Impound Vehicle', value = 'impound_vehicle' },
+		{ label = 'Unlock Vehicle', value = 'unlock_vehicle'},
+		{ label = 'Flip Vehicle', value = 'flip_vehicle'},
+		{ label = 'Push Vehicle', value = 'push_vehicle'},
+		{ label = 'Tow/Detach Vehicle', value = 'flatbed_tow'},
+		{ label = 'Prop Emotes', value = 'prop_emotes'},
+		{ label = 'NPC Jobs', value = 'npc_jobs' },
+	}
+	Menu.Open('default', GetCurrentResourceName(), 'towtrucker_action_main_menu',
+		{
+			title = 'Tow Trucker Menu',
+			align = 'center',
+			elements = elements
+		},
+	function(data, menu)
+		local action = data.current.value
+		if action == 'billing' then
+			Billing()
+		elseif action == 'impound_vehicle' then
+			ImpoundClosestVehicle()
+		elseif action == 'unlock_vehicle' then
+			UnlockClosestVehicle()
+		elseif action == 'flip_vehicle' then 
+			FlipClosestVehicle()
+		elseif action == 'push_vehicle' then 
+			PushClosestVehicle()
+		elseif action == 'flatbed_tow' then 
+			FlatbedTowFunction()
+		elseif action == 'prop_emotes' then
+			if IsPedInAnyVehicle(GetPlayerPed(-1), true) then 
+				TriggerEvent('t1ger_towtrucker:notify', Lang['action_not_possible'])
+			else
+				menu.close()
+				if not holdingObj then 
+					CarryObjectsMainMenu()
+				else
+					TriggerEvent('t1ger_towtrucker:notify', Lang['already_holding_obj'])
+				end
+			end
+		elseif action == 'npc_jobs' then
+			TowTruckerJobs()
+		end
+	end, function(data, menu)
+		menu.close()
+	end)
+end
+
+function Billing()
+	Menu.CloseAll()
+	Menu.Open('dialog', GetCurrentResourceName(), 'towtrucker_billing_dialog', {title = 'Invoice Amount' }, function(data, menu)
+		local amount = tonumber(data.value)
+		if amount then
+			local closestPlayer, closestDistance = Game.GetClosestPlayer()
+			if closestPlayer == -1 or closestDistance > 3.0 then
+				TriggerEvent('t1ger_towtrucker:notify', Lang['no_players_nearby'])
+			else
+				local cfg = Config.Society[Config.TowServices[towID].society]
+				TriggerServerEvent('t1ger_towtrucker:server:issueInvoice', GetPlayerServerId(closestPlayer), cfg.account, cfg.label, amount)
+			end
+		else
+			TriggerEvent('t1ger_towtrucker:notify', Lang['invalid_amount'])
+		end
+	end, function(data, menu)
+		menu.close()	
+		OpenTowTruckerActionMenu()
+	end)
+end
+
+function ImpoundClosestVehicle()
+	local cfg = Config.ImpoundVehicle
+	local coordA = GetEntityCoords(player, 1)
+	local coordB = GetOffsetFromEntityInWorldCoords(player, 0.0, cfg.dist, 0.0)
+	local targetVeh = GetVehicleInDirection(coordA, coordB)
+	local impounded = false
+	if (DoesEntityExist(targetVeh) and IsEntityAVehicle(targetVeh)) then
+		Menu.CloseAll()
+		T1GER_GetControlOfEntity(targetVeh)
+		SetEntityAsMissionEntity(targetVeh, true, true)
+		local d1, d2 = GetModelDimensions(GetEntityModel(targetVeh))
+		local impound_pos = GetOffsetFromEntityInWorldCoords(targetVeh, d1.x-0.2, 0.0, 0.0)
+		while not impounded do 
+			Wait(1)
+			local dist = #(coords - vector3(impound_pos.x, impound_pos.y, impound_pos.z))
+			if dist < cfg.drawText.dist then
+				T1GER_DrawTxt(impound_pos.x, impound_pos.y, impound_pos.z, cfg.drawText.str)
+				if IsControlJustPressed(0, cfg.drawText.keybind) then 
+					if dist <= cfg.drawText.interactDist then
+						TaskTurnPedToFaceEntity(player, targetVeh, 1.0)
+						Wait(500)
+						SetCurrentPedWeapon(player, GetHashKey("WEAPON_UNARMED"), true)
+						Wait(300)
+						if cfg.freeze then FreezeEntityPosition(player, true) end
+						TaskStartScenarioInPlace(player, cfg.scenario, 0, true)
+						if Config.ProgressBars then 
+							lib.progressBar({
+								duration = cfg.progressBar.timer,
+								label = cfg.progressBar.text,
+								useWhileDead = false,
+								canCancel = false,
+								disable = {
+									move = true,
+									car = true,
+									combat = true
+								}
+							})
+						else
+							Wait(cfg.progressBar.timer - 1000)
+						end
+						ClearPedTasks(player)
+						Wait(1000)
+						FreezeEntityPosition(player, false)
+						impounded = true
+						break
+					else
+						TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+					end
+				end
+			end
+		end
+		local veh_props = Game.GetVehicleProperties(targetVeh)
+		local fuel = GetVehicleFuelLevel(targetVeh)
+		if Config.T1GER_Garage then
+			exports['t1ger_garage']:SetVehicleImpounded(targetVeh, false)
+		else
+			print('insert your impound event/function in here, to update state of the vehicle')
+		end
+		Game.DeleteVehicle(targetVeh)
+		TriggerEvent('t1ger_towtrucker:notify', Lang['vehicle_impounded']:format(veh_props.plate))
+	else
+		TriggerEvent('t1ger_towtrucker:notify', Lang['no_vehicle_nearby'])
+	end
+end
+
+function UnlockClosestVehicle()
+	local cfg = Config.UnlockVehicle
+	local coordA = GetEntityCoords(player, 1)
+	local coordB = GetOffsetFromEntityInWorldCoords(player, 0.0, cfg.dist, 0.0)
+	local targetVeh = GetVehicleInDirection(coordA, coordB)
+	local unlocked = false
+	if (DoesEntityExist(targetVeh) and IsEntityAVehicle(targetVeh)) then
+		Menu.CloseAll()
+		T1GER_GetControlOfEntity(targetVeh)
+		SetEntityAsMissionEntity(targetVeh, true, true)
+		local d1, d2 = GetModelDimensions(GetEntityModel(targetVeh))
+		local unlockPos = GetOffsetFromEntityInWorldCoords(targetVeh, d1.x-0.2, 0.0, 0.0)
+		while not unlocked do 
+			Wait(1)
+			local dist = #(coords - vector3(unlockPos.x, unlockPos.y, unlockPos.z))
+			if dist < cfg.drawText.dist then
+				T1GER_DrawTxt(unlockPos.x, unlockPos.y, unlockPos.z, cfg.drawText.str)
+				if IsControlJustPressed(0, cfg.drawText.keybind) then 
+					if dist <= cfg.drawText.interactDist then
+						T1GER_LoadAnim(cfg.anim.dict)
+						TaskTurnPedToFaceEntity(player, targetVeh, 1.0)
+						Wait(500)
+						SetCurrentPedWeapon(player, GetHashKey("WEAPON_UNARMED"), true)
+						Wait(300)
+						if cfg.freeze then FreezeEntityPosition(player, true) end
+						TaskPlayAnim(player, cfg.anim.dict, cfg.anim.lib, 3.0, 3.0, -1, 31, 1.0, 0, 0, 0)
+						if Config.ProgressBars then 
+							lib.progressBar({
+								duration = cfg.progressBar.timer,
+								label = cfg.progressBar.text,
+								useWhileDead = false,
+								canCancel = false,
+								disable = {
+									move = true,
+									car = true,
+									combat = true
+								}
+							})
+						else
+							Wait(cfg.progressBar.timer)
+						end
+						ClearPedTasks(player)
+						FreezeEntityPosition(player, false)
+						unlocked = true
+						break
+					else
+						TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+					end
+				end
+			end
+		end
+		PlayVehicleDoorOpenSound(targetVeh, 0)
+		SetVehicleDoorsLockedForAllPlayers(targetVeh, false)
+		SetVehicleDoorsLocked(targetVeh, 1)
+		if Config.T1GER_Keys then
+			exports['t1ger_keys']:SetVehicleLocked(targetVeh, 0)
+		end
+		TriggerEvent('t1ger_towtrucker:notify', Lang['vehicle_unlocked'])
+	else
+		TriggerEvent('t1ger_towtrucker:notify', Lang['no_vehicle_nearby'])
+	end
+end
+
+function FlipClosestVehicle()
+	local cfg = Config.FlipVehicle
+	local coordA = GetEntityCoords(player, 1)
+	local coordB = GetOffsetFromEntityInWorldCoords(player, 0.0, cfg.dist, 0.0)
+	local targetVeh = GetVehicleInDirection(coordA, coordB)
+	local flipped = false 
+	if (DoesEntityExist(targetVeh) and IsEntityAVehicle(targetVeh)) then
+		Menu.CloseAll()
+		T1GER_GetControlOfEntity(targetVeh)
+		SetEntityAsMissionEntity(targetVeh, true, true)
+		local d1, d2 = GetModelDimensions(GetEntityModel(targetVeh))
+		local flip_pos = GetOffsetFromEntityInWorldCoords(targetVeh, d1.x-0.2, 0.0, 0.0)
+		while not flipped do 
+			Wait(1)
+			local dist = #(coords - vector3(flip_pos.x, flip_pos.y, flip_pos.z))
+			if dist < cfg.drawText.dist then
+				T1GER_DrawTxt(flip_pos.x, flip_pos.y, flip_pos.z, cfg.drawText.str)
+				if IsControlJustPressed(0, cfg.drawText.keybind) then
+					if dist <= cfg.drawText.interactDist then
+						TaskTurnPedToFaceEntity(player, targetVeh, 1.0)
+						Wait(500)
+						SetCurrentPedWeapon(player, GetHashKey("WEAPON_UNARMED"), true)
+						Wait(300)
+						if cfg.freeze then FreezeEntityPosition(player, true) end
+						TaskStartScenarioInPlace(player, cfg.scenario, 0, true)
+						if Config.ProgressBars then 
+							lib.progressBar({
+								duration = cfg.progressBar.timer,
+								label = cfg.progressBar.text,
+								useWhileDead = false,
+								canCancel = false,
+								disable = {
+									move = true,
+									car = true,
+									combat = true
+								}
+							})
+						else
+							Wait(cfg.progressBar.timer - 1000)
+						end
+						ClearPedTasks(player)
+						Wait(1000)
+						FreezeEntityPosition(player, false)
+						flipped = true
+						break
+					else
+						TriggerEvent('t1ger_towtrucker:notify', Lang['move_closer_interact'])
+					end
+				end
+			end
+		end
+		SetVehicleOnGroundProperly(targetVeh)
+	else
+		TriggerEvent('t1ger_towtrucker:notify', Lang['no_vehicle_nearby'])
+	end
+end
