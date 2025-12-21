@@ -1,0 +1,368 @@
+-- ## BOSS / MANAGE ## --
+
+local bossMenu, impoundMenu, garageMenu = nil, nil, nil
+local currentTextPoint
+local bossPoints, impoundPoints, garagePoints = {}, {}, {}
+
+local function showPointText(point, text)
+	if not text then return end
+
+	if currentTextPoint ~= point or point.__text ~= text then
+		if currentTextPoint and currentTextPoint ~= point and currentTextPoint.__text then
+			lib.hideTextUI()
+			currentTextPoint.__text = nil
+		end
+
+		lib.showTextUI(text)
+		point.__text = text
+		currentTextPoint = point
+	end
+end
+
+local function clearPointText(point)
+	if not point then return end
+
+	if currentTextPoint == point then
+		lib.hideTextUI()
+		currentTextPoint = nil
+	end
+
+	point.__text = nil
+end
+
+local function destroyPoints(store)
+	for id, point in pairs(store) do
+		clearPointText(point)
+		point:remove()
+		store[id] = nil
+	end
+end
+
+local function createBossPoint(id, service)
+	if not service.boss_pos then return end
+
+	local mk = Config.MarkerSettings['boss'] or {}
+	local coords = toVector3(service.boss_pos)
+	bossPoints[id] = lib.points.new({
+		coords = coords,
+		distance = mk.drawDist or 10.0,
+		nearby = function(point)
+			if mk.enable and point.currentDistance <= (mk.drawDist or point.distance) then
+				DrawMarker(mk.type, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2)
+			end
+
+			if point.currentDistance > 2.0 then
+				clearPointText(point)
+				return
+			end
+
+			local society = Config.Society[service.society]
+			if not society then
+				clearPointText(point)
+				return
+			end
+
+			local text
+			if service.owned == true then
+				if (T1GER_isJob(society.name)) or (isOwner == id) then
+					text = Lang['draw_service_menu']
+					if IsControlJustPressed(0, Config.KeyControls['service_menu']) then
+						bossMenu = service
+						OpenTowServiceMenu(id, service)
+					end
+				else
+					text = Lang['draw_service_no_access']
+				end
+			else
+				if (T1GER_isJob(society.name) and not T1GER_IsBoss()) or (isOwner == 0) then
+					text = Lang['draw_buy_service']:format(comma_value(math.floor(service.price)))
+					if IsControlJustPressed(0, Config.KeyControls['buy_service']) then
+						bossMenu = service
+						PurchaseTowService(id, service)
+					end
+				else
+					text = Lang['draw_service_own_one']
+				end
+			end
+
+			if text then
+				showPointText(point, text)
+			else
+				clearPointText(point)
+			end
+		end,
+		onExit = function(point)
+			clearPointText(point)
+			if bossMenu then
+				Menu.CloseAll()
+				bossMenu = nil
+			end
+		end
+	})
+end
+
+local function createImpoundPoint(id, service)
+	if not service.impound_pos then return end
+
+	local mk = Config.MarkerSettings['impound'] or {}
+	local coords = toVector3(service.impound_pos)
+	impoundPoints[id] = lib.points.new({
+		coords = coords,
+		distance = mk.drawDist or 10.0,
+		nearby = function(point)
+			if mk.enable and point.currentDistance <= (mk.drawDist or point.distance) then
+				DrawMarker(mk.type, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2)
+			end
+
+			if point.currentDistance > 2.0 then
+				clearPointText(point)
+				return
+			end
+
+			local text
+			local society = Config.Society[service.society]
+			if society and service.owned == true and ((T1GER_isJob(society.name)) or (isOwner == id)) then
+				text = Lang['draw_impound_menu']
+				if IsControlJustPressed(0, Config.KeyControls['impound_menu']) then
+					impoundMenu = service
+					OpenImpoundMenu(id, service)
+				end
+			end
+
+			if text then
+				showPointText(point, text)
+			else
+				clearPointText(point)
+			end
+		end,
+		onExit = function(point)
+			clearPointText(point)
+			if impoundMenu then
+				Menu.CloseAll()
+				impoundMenu = nil
+			end
+		end
+	})
+end
+
+local function createGaragePoint(id, garageCfg)
+	if not garageCfg or garageCfg.enable ~= true then return end
+
+	local mk = Config.MarkerSettings['garage'] or {}
+	local coords = toVector3(garageCfg.pos)
+	garagePoints[id] = lib.points.new({
+		coords = coords,
+		distance = mk.drawDist or 10.0,
+		nearby = function(point)
+			if mk.enable and point.currentDistance <= (mk.drawDist or point.distance) then
+				DrawMarker(mk.type, coords.x, coords.y, coords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, mk.scale.x, mk.scale.y, mk.scale.z, mk.color.r, mk.color.g, mk.color.b, mk.color.a, false, true, 2)
+			end
+
+			if point.currentDistance > 2.0 then
+				clearPointText(point)
+				return
+			end
+
+			local service = Config.TowServices[id]
+			if not service or service.owned ~= true then
+				clearPointText(point)
+				return
+			end
+
+			local society = Config.Society[service.society]
+			if society and ((T1GER_isJob(society.name)) or (isOwner == id)) then
+				local vehicle = PlayerVehicle()
+				local text = vehicle and Lang['draw_store_del_veh'] or Lang['draw_garage_menu']
+				showPointText(point, text)
+
+				if IsControlJustPressed(0, Config.KeyControls['garage_menu']) then
+					garageMenu = garageCfg
+					OpenGarageMenu(id, garageCfg)
+				end
+			else
+				showPointText(point, Lang['draw_service_no_access'])
+			end
+		end,
+		onExit = function(point)
+			clearPointText(point)
+			if garageMenu then
+				Menu.CloseAll()
+				garageMenu = nil
+			end
+		end
+	})
+end
+
+local function RefreshTowServicePoints()
+	destroyPoints(bossPoints)
+	destroyPoints(impoundPoints)
+	destroyPoints(garagePoints)
+
+	Menu.CloseAll()
+	bossMenu, impoundMenu, garageMenu = nil, nil, nil
+
+	for id, service in pairs(Config.TowServices) do
+		createBossPoint(id, service)
+		createImpoundPoint(id, service)
+		createGaragePoint(id, Config.TowServiceGarage[id])
+	end
+end
+
+RefreshTowServicePoints()
+
+function PurchaseTowService(id, val)
+	local elements = {
+		{ label = 'No', value = 'decline_purchase' },
+		{ label = 'Yes', value = 'confirm_purchase' },
+	}
+	Menu.Open('default', GetCurrentResourceName(), 'tow_service_purchase_confirmation',
+		{
+			title = 'Confirm | Price: $'..comma_value(math.floor(val.price)),
+			align = 'center',
+			elements = elements
+		},
+	function(data, menu)
+		if data.current.value ~= 'decline_purchase' then
+			Menu.Open('dialog', GetCurrentResourceName(), 'enter_service_name', {
+				title = 'Enter Tow Service Name'
+			}, function(data2, menu2)
+				local name = tostring(data2.value)
+				if name == nil or name == '' then
+					TriggerEvent('t1ger_towtrucker:notify', Lang['invalid_string'])
+				else
+					menu2.close()
+					ESX.TriggerServerCallback('t1ger_towtrucker:buyTowService', function(purchased)
+						if purchased then
+							TriggerEvent('t1ger_towtrucker:notify', (Lang['service_purchased']):format(comma_value(math.floor(val.price))))
+							isOwner = id
+							TriggerServerEvent('t1ger_towtrucker:updateTowServices', id, val, true, name)
+						else
+							TriggerEvent('t1ger_towtrucker:notify', Lang['not_enough_money'])
+						end
+					end, id, val, name)
+				end
+			end,
+			function(data2, menu2)
+				menu2.close()
+			end)
+		end
+		menu.close()
+		bossMenu = nil
+	end, function(data, menu)
+		menu.close()
+		bossMenu = nil
+	end)
+end
+
+function OpenTowServiceMenu(id, val)
+	Menu.CloseAll()
+	local elements = {}
+	if (T1GER_isJob(Config.Society[val.society].name) and T1GER_IsBoss()) or isOwner == id then
+		table.insert(elements, {label = 'Rename Tow Service', value = 'rename_tow_service'})
+		table.insert(elements, {label = 'Sell Tow Service', value = 'sell_tow_service'})
+		table.insert(elements, {label = 'Boss Menu', value = 'boss_menu'})
+	end
+	if #elements > 0 then 
+		Menu.Open('default', GetCurrentResourceName(), 'tow_service_main',
+			{
+				title = 'Tow Service ['..tostring(id)..']',
+				align = 'center',
+				elements = elements
+			},
+		function(data, menu)
+			local action = data.current.value
+			if action == 'rename_tow_service' then
+				RenameTowService(id, val)
+			elseif action == 'sell_tow_service' then
+				SellTowService(id, val)
+			elseif action == 'boss_menu' then
+				BossMenu(id, val)
+			end
+		end, function(data, menu)
+			menu.close()
+			bossMenu = nil
+		end)
+	else
+		TriggerEvent('t1ger_towtrucker:notify', Lang['boss_menu_no_access'])
+		bossMenu = nil
+	end
+end
+
+function RenameTowService(id, val)
+	Menu.CloseAll()
+	Menu.Open('dialog', GetCurrentResourceName(), 'rename_tow_service', {
+		title = 'Enter Tow Service Name'
+	}, function(data, menu)
+		local name = tostring(data.value)
+		if name == nil or name == '' then
+			TriggerEvent('t1ger_towtrucker:notify', Lang['invalid_string'])
+		else
+			menu.close()
+			TriggerServerEvent('t1ger_towtrucker:updateTowServices', id, val, nil, name)
+			TriggerEvent('t1ger_towtrucker:notify', Lang['tow_service_renamed'])
+			OpenTowServiceMenu(id, val)
+		end
+	end,
+	function(data, menu)
+		menu.close()
+		OpenTowServiceMenu(id, val)
+	end)
+end
+
+function SellTowService(id, val)
+	local sellPrice = (val.price * Config.SalePercentage)
+	local elements = {
+		{ label = 'No', value = 'decline_sale' },
+		{ label = 'Yes', value = 'confirm_sale' },
+	}
+	Menu.Open('default', GetCurrentResourceName(), 'tow_service_sell_confirmation',
+		{
+			title = 'Confirm Sale | Price: $'..comma_value(math.floor(sellPrice)),
+			align = 'center',
+			elements = elements
+		},
+	function(data, menu)
+		if data.current.value == 'confirm_sale' then
+			Menu.CloseAll()
+			TriggerServerEvent('t1ger_towtrucker:sellTowService', id, val, math.floor(sellPrice))
+			TriggerServerEvent('t1ger_towtrucker:updateTowServices', id, val, false, nil)
+			isOwner = 0
+			TriggerEvent('t1ger_towtrucker:notify', (Lang['service_sold']):format(comma_value(math.floor(sellPrice))))
+			bossMenu = nil
+		else
+			menu.close()
+			OpenTowServiceMenu(id, val)
+		end
+	end, function(data, menu)
+		menu.close()
+		OpenTowServiceMenu(id, val)
+	end)
+end
+
+function BossMenu(id, val)
+	local cfg = Config.Society[val.society]
+	Menu.Open('default', GetCurrentResourceName(), 'boss_main_menu',
+		{
+			title = cfg.label,
+			align = 'center',
+			elements = {
+				{ label = 'Boss Actions', value = 'boss_actions', job = cfg.name },
+				{ label = 'Account Balance', value = 'get_balance', job = cfg.name}
+			}
+		},
+	function(data, menu)
+		if data.current.value == 'boss_actions' then
+			menu.close()
+			TriggerEvent('esx_society:openBossMenu', data.current.job, function(data2, menu2)
+				menu2.close()
+			end)
+		elseif data.current.value == 'get_balance' then
+			ESX.TriggerServerCallback('t1ger_towtrucker:getSocietyFunds', function(amount)
+				TriggerEvent('t1ger_towtrucker:notify', Lang['get_account_balance']:format(comma_value(amount or 0)))
+			end, data.current.job)
+		end
+	end, function(data, menu)
+		menu.close()
+		OpenTowServiceMenu(id, val)
+	end)
+end
