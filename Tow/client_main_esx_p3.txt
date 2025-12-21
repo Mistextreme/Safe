@@ -1,0 +1,189 @@
+-- ## IMPOUND ## --
+
+function OpenImpoundMenu(id, val)
+	Menu.CloseAll()
+	local elements = {
+		{ label = 'Impound List', value = 'impound_list' },
+	}
+	if IsPedInAnyVehicle(player, 0) then
+		table.insert(elements, {label = 'Impound Vehicle', value = 'impound_vehicle'})
+	end
+	Menu.Open('default', GetCurrentResourceName(), 'tow_impound_main',
+		{
+			title = 'Impound ['..tostring(id)..']',
+			align = 'center',
+			elements = elements
+		},
+	function(data, menu)
+		if data.current.value == 'impound_list' then
+			ImpoundList(id, val)
+		end
+		if data.current.value == 'impound_vehicle' then
+			ImpoundCurrentVehicle(id, val)
+		end
+	end, function(data, menu)
+		menu.close()
+		impoundMenu = nil
+	end)
+end
+
+function ImpoundList(id, val)
+	local elements = {}
+	ESX.TriggerServerCallback('t1ger_towtrucker:GetImpoundVehicles', function(impoundList)
+		if impoundList ~= nil then
+			if next(impoundList) then
+				for k, v in pairs(impoundList) do
+					local props = json.decode(v.props)
+					local veh_label = GetLabelText(GetDisplayNameFromVehicleModel(props.model))
+					table.insert(elements, {
+						label = veh_label..' ['..v.plate..']',
+						name = veh_label,
+						value = v,
+						plate = v.plate, 
+						vehicle = props, 
+						owner = v.owner
+					})
+				end
+				if next(elements) then
+					Menu.CloseAll()
+					Menu.Open('default', GetCurrentResourceName(), 'impound_veh_list',
+						{
+							title = 'Click to Release Vehicle',
+							align = 'center',
+							elements = elements
+						},
+					function(data, menu)
+						if data.current.value ~= nil then 
+							Game.SpawnVehicle(data.current.vehicle.model, {x = val.impound_pos.x, y = val.impound_pos.y, z = (val.impound_pos.z + 1.0)}, val.impound_pos.w, function(impoundVehicle)
+								Game.SetVehicleProperties(impoundVehicle, data.current.vehicle)
+								SetVehRadioStation(impoundVehicle, "OFF")
+								TaskWarpPedIntoVehicle(player, impoundVehicle, -1)
+								SetVehicleFuelLevel(impoundVehicle, 100.0)
+								if Config.T1GER_Keys then
+									exports['t1ger_keys']:SetVehicleLocked(impoundVehicle, 0)
+								end
+							end)
+							TriggerServerEvent('t1ger_towtrucker:releaseImpound', id, data.current.plate, data.current.vehicle, data.current.owner)
+							Menu.CloseAll()
+							impoundMenu = nil
+						end
+					end, function(data, menu)
+						OpenImpoundMenu(id, val)
+					end)
+				else
+					return TriggerEvent('t1ger_towtrucker:notify', Lang['no_impound_vehicles'])
+				end
+			end
+		else
+			return TriggerEvent('t1ger_towtrucker:notify', Lang['no_impound_vehicles'])
+		end
+	end, id)
+end
+
+function ImpoundCurrentVehicle(id, val)
+	local elements = {
+		{ label = 'No', value = 'decline_impound' },
+		{ label = 'Yes', value = 'confirm_impound' },
+	}
+	local vehicle = GetVehiclePedIsIn(player, false)
+	local props = Game.GetVehicleProperties(vehicle)
+	local plate = tostring(GetVehicleNumberPlateText(vehicle))
+	Menu.CloseAll()
+	Menu.Open('default', GetCurrentResourceName(), 'tow_service_impound_confirmation',
+		{
+			title = 'Impound Vehicle? ['..plate..']',
+			align = 'center',
+			elements = elements
+		},
+	function(data, menu)
+		if data.current.value ~= 'decline_impound' then
+			ESX.TriggerServerCallback('t1ger_towtrucker:impoundVehicle', function(impounded, notify)
+				if impounded then
+					DeleteVehicle(vehicle)
+				end
+				TriggerEvent('t1ger_towtrucker:notify', notify)
+				Menu.CloseAll()
+				impoundMenu = nil
+			end, id, plate, props)
+		end
+	end, function(data, menu)
+		OpenImpoundMenu(id, val)
+	end)
+end
+
+function IsVehicleInTowImpound(plate)
+	local isImpounded, impoundID, name, checked = false, 0, nil, false
+	ESX.TriggerServerCallback('t1ger_towtrucker:isVehicleInTowImpound', function(state, id)
+		isImpounded = state
+		impoundID = id
+		checked = true
+	end, plate)
+	while not checked do 
+		Wait(10)
+	end
+	if towServices[impoundID] ~= nil then
+		name = towServices[impoundID].name
+	end
+	return isImpounded, impoundID, name
+end
+
+-- ## GARAGE ## --
+
+function OpenGarageMenu(id, val)
+	local vehicle = GetVehiclePedIsIn(player, false)
+	if vehicle ~= 0 and DoesEntityExist(vehicle) then
+		if DoesEntityExist(vehicle) then 
+			DeleteVehicle(vehicle)
+			garageMenu = nil
+		end
+	else
+		local elements = {}
+		for k, v in ipairs(val.vehicles) do
+			if T1GER_GetJobGrade() >= v.grade then
+				table.insert(elements, {label = v.label, model = v.model})
+			end
+		end
+		if next(elements) == nil then 
+			garageMenu = nil
+			Menu.CloseAll()
+			return TriggerEvent('t1ger_towtrucker:notify', 'No job vehicles available.')
+		end
+		Menu.Open('default', GetCurrentResourceName(), 'tow_job_veh_list',
+			{
+				title = 'Select Job Vehicle',
+				align = 'center',
+				elements = elements
+			},
+		function(data, menu)
+			SpawnJobVehicle(val, data.current.model, data.current.label, data.current.jobs)
+			Menu.CloseAll()
+			garageMenu = nil
+		end, function(data, menu)
+			menu.close()
+			garageMenu = nil
+		end)
+	end
+end
+
+function SpawnJobVehicle(val, model, name)
+	Game.SpawnVehicle(model, vector3(val.pos.x, val.pos.y, val.pos.z), val.pos.w, function(vehicle)
+		while not DoesEntityExist(vehicle) do
+			Wait(5)
+		end
+		if val.teleport then 
+			TaskWarpPedIntoVehicle(player, vehicle, -1)
+		end
+		local plate = 'TOWTRUCK'
+		if Config.T1GER_Dealerships then 
+			plate = exports['t1ger_dealerships']:ProduceNumberPlate()
+		else
+			-- insert your own plate generation function/export in here
+		end
+		SetVehicleNumberPlateText(vehicle, plate)
+		if Config.T1GER_Keys then
+			exports['t1ger_keys']:SetVehicleLocked(vehicle, 0)
+			exports['t1ger_keys']:GiveJobKeys(plate, name, true)
+		end
+		SetVehicleFuelLevel(vehicle, val.fuel)
+	end)
+end
